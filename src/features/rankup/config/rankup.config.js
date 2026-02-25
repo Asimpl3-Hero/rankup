@@ -6,5 +6,5 @@ export const RANKUP_CONFIG = Object.freeze({
 })
 
 export const RANKUP_COPY = Object.freeze({
-  vectorsFoundSuffix: '_VECTORS_FOUND',
+  vectorsFoundSuffix: '_VECTORES_ENCONTRADOS',
 })

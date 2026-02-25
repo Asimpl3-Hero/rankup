@@ -11,39 +11,40 @@ function toSafePercent(hype) {
 }
 
 function getTierByHypePercent(hypePercent) {
-  if (hypePercent >= 80) return 'S_RANK'
-  if (hypePercent >= 65) return 'A_RANK'
-  if (hypePercent >= 45) return 'B_RANK'
-  if (hypePercent >= 25) return 'C_RANK'
-  return 'D_RANK'
+  if (hypePercent >= 80) return 'S'
+  if (hypePercent >= 65) return 'A'
+  if (hypePercent >= 45) return 'B'
+  if (hypePercent >= 25) return 'C'
+  return 'D'
 }
 
 function getTierStateClass(tier) {
-  if (tier === 'S_RANK') return 'svr-rank-tier--s'
-  if (tier === 'A_RANK') return 'svr-rank-tier--a'
-  if (tier === 'B_RANK') return 'svr-rank-tier--b'
-  if (tier === 'C_RANK') return 'svr-rank-tier--c'
+  if (tier === 'S') return 'svr-rank-tier--s'
+  if (tier === 'A') return 'svr-rank-tier--a'
+  if (tier === 'B') return 'svr-rank-tier--b'
+  if (tier === 'C') return 'svr-rank-tier--c'
   return 'svr-rank-tier--d'
 }
 
-function getRankingMessage(tier, deltaVsAverage) {
-  if (tier === 'S_RANK') {
-    return 'SIGNAL_DOMINANCE: This video is leading the arcade board.'
+function getRankingMessage(tier, deltaVsAverage, rankingCopy) {
+  if (tier === 'S') {
+    return rankingCopy?.messages?.dominance ?? 'SIGNAL_DOMINANCE'
   }
   if (deltaVsAverage >= 10) {
-    return 'UPTREND_DETECTED: Performance is climbing above stream average.'
+    return rankingCopy?.messages?.uptrend ?? 'UPTREND_DETECTED'
   }
   if (deltaVsAverage <= -10) {
-    return 'LOW_SIGNAL_ZONE: Needs stronger interaction momentum.'
+    return rankingCopy?.messages?.lowSignal ?? 'LOW_SIGNAL_ZONE'
   }
-  return 'STABLE_LOOP: Performance is holding around feed average.'
+  return rankingCopy?.messages?.stable ?? 'STABLE_LOOP'
 }
 
 /**
  * @param {import('../types').CartridgeItem} video
  * @param {import('../types').CartridgeItem[]=} rankingPool
+ * @param {{ tiers?: Record<string, string>, messages?: Record<string, string> }=} rankingCopy
  */
-export function buildVideoRankingContext(video, rankingPool) {
+export function buildVideoRankingContext(video, rankingPool, rankingCopy) {
   const normalizedPool =
     Array.isArray(rankingPool) && rankingPool.length > 0
       ? rankingPool
@@ -77,10 +78,10 @@ export function buildVideoRankingContext(video, rankingPool) {
     averageHypePercent,
     deltaVsAverage,
     hypePercent,
-    message: getRankingMessage(tier, deltaVsAverage),
+    message: getRankingMessage(tier, deltaVsAverage, rankingCopy),
     percentile,
     position,
-    tier,
+    tier: rankingCopy?.tiers?.[tier] ?? `${tier}_RANK`,
     tierClass: getTierStateClass(tier),
     totalItems,
   }

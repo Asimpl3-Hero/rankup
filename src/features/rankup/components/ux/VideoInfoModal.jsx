@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../ui'
 import { buildVideoRankingContext } from '../../utils'
+import { resolveI18nValue } from '../../i18n'
 
-function VideoInfoModal({ isOpen, onClose, rankingPool, video }) {
+function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
   const [isPreviewBroken, setIsPreviewBroken] = useState(false)
 
   useEffect(() => {
@@ -34,12 +35,15 @@ function VideoInfoModal({ isOpen, onClose, rankingPool, video }) {
     return null
   }
 
-  const ranking = buildVideoRankingContext(video, rankingPool)
+  const ranking = buildVideoRankingContext(video, rankingPool, i18n.ranking)
   const hasPreviewImage =
     typeof video.thumbnail === 'string' &&
     video.thumbnail.trim().length > 0 &&
     !isPreviewBroken
-  const sourceId = `YT_FEED_${String(ranking.position).padStart(2, '0')}`
+  const sourceId = `${i18n.modal.sourceIdPrefix}_${String(ranking.position).padStart(2, '0')}`
+  const title = resolveI18nValue(video.title, i18n.fallback.untitledVideo)
+  const author = resolveI18nValue(video.author, i18n.fallback.unknownChannel)
+  const publishedAt = resolveI18nValue(video.publishedAt, i18n.fallback.noDate)
   const recMinutes = String((ranking.position * 3 + ranking.hypePercent) % 60).padStart(2, '0')
   const recSeconds = String((ranking.hypePercent * 2 + ranking.totalItems) % 60).padStart(2, '0')
   const recFrames = String((ranking.percentile + ranking.position) % 30).padStart(2, '0')
@@ -51,15 +55,15 @@ function VideoInfoModal({ isOpen, onClose, rankingPool, video }) {
         className="svr-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Video details"
+        aria-label={i18n.modal.ariaLabel}
         onClick={(event) => event.stopPropagation()}
       >
         <header className="svr-modal-header">
-          <div className="svr-modal-chip">VIDEO_DATA_PACKET</div>
+          <div className="svr-modal-chip">{i18n.modal.packetLabel}</div>
           <Button
             type="button"
             className="svr-modal-close"
-            aria-label="Close modal"
+            aria-label={i18n.modal.closeLabel}
             onClick={onClose}
           >
             X
@@ -74,7 +78,7 @@ function VideoInfoModal({ isOpen, onClose, rankingPool, video }) {
                   <img
                     className="svr-modal-preview-image"
                     src={video.thumbnail}
-                    alt={`Preview of ${video.title ?? 'video'}`}
+                    alt={`${i18n.modal.ariaLabel}: ${title || i18n.fallback.videoWord}`}
                     loading="lazy"
                     onError={() => setIsPreviewBroken(true)}
                   />
@@ -90,42 +94,42 @@ function VideoInfoModal({ isOpen, onClose, rankingPool, video }) {
               </div>
 
               <div className="svr-modal-preview-meta">
-                <span>SOURCE: {sourceId}</span>
-                <span>LIVE CONNECTION</span>
+                <span>{i18n.modal.sourceLabel}: {sourceId}</span>
+                <span>{i18n.modal.liveConnectionLabel}</span>
               </div>
             </aside>
 
             <div className="svr-modal-data">
               <div className="svr-modal-title-wrap">
-                <h3>{video.title ?? 'UNTITLED_VIDEO'}</h3>
+                <h3>{title}</h3>
                 <span className={`svr-rank-tier ${ranking.tierClass}`}>{ranking.tier}</span>
               </div>
 
               <div className="svr-modal-grid">
                 <article className="svr-modal-cell">
-                  <span>CHANNEL</span>
-                  <strong>{video.author ?? 'UNKNOWN_CHANNEL'}</strong>
+                  <span>{i18n.modal.channelLabel}</span>
+                  <strong>{author}</strong>
                 </article>
                 <article className="svr-modal-cell">
-                  <span>PUBLISHED</span>
-                  <strong>{video.publishedAt ?? 'NO_DATE'}</strong>
+                  <span>{i18n.modal.publishedLabel}</span>
+                  <strong>{publishedAt}</strong>
                 </article>
                 <article className="svr-modal-cell svr-modal-cell-highlight">
-                  <span>HYPE_SIGNAL</span>
+                  <span>{i18n.modal.hypeSignalLabel}</span>
                   <strong>{ranking.hypePercent}%</strong>
                 </article>
                 <article className="svr-modal-cell">
-                  <span>RANK_POS</span>
+                  <span>{i18n.modal.positionLabel}</span>
                   <strong>
                     #{ranking.position}/{ranking.totalItems}
                   </strong>
                 </article>
                 <article className="svr-modal-cell">
-                  <span>PERCENTILE</span>
+                  <span>{i18n.modal.percentileLabel}</span>
                   <strong>{ranking.percentile}%</strong>
                 </article>
                 <article className="svr-modal-cell">
-                  <span>VS_AVERAGE</span>
+                  <span>{i18n.modal.vsAverageLabel}</span>
                   <strong>
                     {ranking.deltaVsAverage >= 0 ? '+' : ''}
                     {ranking.deltaVsAverage}%
@@ -135,8 +139,8 @@ function VideoInfoModal({ isOpen, onClose, rankingPool, video }) {
 
               <div className="svr-rank-meter-wrap">
                 <div className="svr-rank-meter-label">
-                  <span>RANKING_ENERGY</span>
-                  <span>{ranking.averageHypePercent}% AVG</span>
+                  <span>{i18n.modal.rankingEnergyLabel}</span>
+                  <span>{ranking.averageHypePercent}% {i18n.modal.averageShortLabel}</span>
                 </div>
                 <div className="svr-rank-meter">
                   <div style={{ width: `${ranking.hypePercent}%` }} />
@@ -144,7 +148,7 @@ function VideoInfoModal({ isOpen, onClose, rankingPool, video }) {
               </div>
 
               <p className="svr-modal-text">
-                [RANK_LOGIC]: {ranking.message}
+                [{i18n.modal.logicLabel}]: {ranking.message}
               </p>
             </div>
           </div>

@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { RANKUP_COPY } from '../config'
 import {
   CARTRIDGES,
   INITIAL_VISIBLE_CARTRIDGES,
   LOAD_MORE_STEP,
-  METRIC_PANELS,
 } from '../constants'
 import {
   buildVectorsCountLabel,
@@ -15,36 +13,35 @@ import {
 } from '../utils'
 import { fetchRankupVideos } from '../services'
 
-/** @returns {import('../types').RankupViewModel} */
-export function useRankup() {
+/**
+ * @param {{ api: { offlinePrefix: string, unknownError: string }, counters: { vectorsSuffix: string }, metricPanels: { avgLabel: string, avgDetail: string, topLabel: string, topDetail: string, freshnessLabel: string, freshnessDetail: string, diversityLabel: string, diversityDetail: string } }} i18n
+ * @returns {import('../types').RankupViewModel}
+ */
+export function useRankup(i18n) {
   const [searchTerm, setSearchTerm] = useState('')
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_CARTRIDGES)
   const [videos, setVideos] = useState(CARTRIDGES)
   const [shuffleSeed] = useState(() => Math.floor(Math.random() * 1_000_000))
   const [isLoading, setIsLoading] = useState(true)
-  const [errorMessage, setErrorMessage] = useState('')
+  const [hasApiError, setHasApiError] = useState(false)
 
   useEffect(() => {
     const abortController = new AbortController()
 
     async function loadVideos() {
       setIsLoading(true)
-      setErrorMessage('')
+      setHasApiError(false)
 
       try {
         const apiVideos = await fetchRankupVideos(abortController.signal)
         setVideos(apiVideos.length > 0 ? apiVideos : CARTRIDGES)
-      } catch (error) {
+      } catch {
         if (abortController.signal.aborted) {
           return
         }
 
         setVideos(CARTRIDGES)
-        setErrorMessage(
-          error instanceof Error
-            ? `API_OFFLINE: ${error.message}`
-            : 'API_OFFLINE: Unknown error',
-        )
+        setHasApiError(true)
       } finally {
         if (!abortController.signal.aborted) {
           setIsLoading(false)
@@ -83,13 +80,16 @@ export function useRankup() {
   )
 
   const hasMore = visibleCount < filteredCartridges.length
+  const errorMessage = hasApiError
+    ? `${i18n.api.offlinePrefix}: ${i18n.api.unknownError}`
+    : ''
   const metrics = useMemo(
-    () => buildMetricsFromVideos(videos, METRIC_PANELS),
-    [videos],
+    () => buildMetricsFromVideos(videos, i18n.metricPanels),
+    [videos, i18n.metricPanels],
   )
   const countLabel = buildVectorsCountLabel(
     filteredCartridges.length,
-    RANKUP_COPY.vectorsFoundSuffix,
+    i18n.counters.vectorsSuffix,
   )
 
   function handleSearchChange(event) {

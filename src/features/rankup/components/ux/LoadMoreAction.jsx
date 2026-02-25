@@ -3,6 +3,11 @@ import { Button } from '../ui'
 function LoadMoreAction({
   buttonClassName = '',
   className = '',
+  labels = {
+    loading: 'LOADING...',
+    noMore: 'NO_MORE',
+    withMore: 'LOAD_MORE',
+  },
   hasMore,
   isLoading = false,
   onLoadMore,
@@ -17,7 +22,7 @@ function LoadMoreAction({
         onClick={onLoadMore}
         disabled={!hasMore || isLoading}
       >
-        {isLoading ? 'LOADING_LEVELS...' : hasMore ? 'LOAD_MORE_LEVELS' : 'NO_MORE_LEVELS'}
+        {isLoading ? labels.loading : hasMore ? labels.withMore : labels.noMore}
       </Button>
     </div>
   )

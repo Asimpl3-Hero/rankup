@@ -45,12 +45,41 @@ function toSafePercent(value) {
 
 /**
  * @param {import('../types').CartridgeItem[]} videos
- * @param {import('../types').MetricPanel[]} fallback
+ * @param {{ avgLabel?: string, avgDetail?: string, topLabel?: string, topDetail?: string, freshnessLabel?: string, freshnessDetail?: string, diversityLabel?: string, diversityDetail?: string }=} metricPanelsCopy
  * @returns {import('../types').MetricPanel[]}
  */
-export function buildMetricsFromVideos(videos, fallback) {
+export function buildMetricsFromVideos(videos, metricPanelsCopy) {
+  const copy = metricPanelsCopy ?? {}
+  const fallbackPanels = [
+    {
+      label: copy.avgLabel ?? 'MONITOR_01: AVG_HYPE',
+      value: '40%',
+      width: '40%',
+      detail: copy.avgDetail ?? 'AVERAGE_HYPE_RATIO',
+      emphasized: true,
+    },
+    {
+      label: copy.topLabel ?? 'MONITOR_02: TOP_HYPE',
+      value: '30%',
+      width: '30%',
+      detail: copy.topDetail ?? 'BEST_VIDEO_SIGNAL',
+    },
+    {
+      label: copy.freshnessLabel ?? 'MONITOR_03: FRESHNESS',
+      value: '20%',
+      width: '20%',
+      detail: copy.freshnessDetail ?? 'RECENT_PUBLICATIONS',
+    },
+    {
+      label: copy.diversityLabel ?? 'MONITOR_04: AUTHORS',
+      value: '10%',
+      width: '10%',
+      detail: copy.diversityDetail ?? 'CHANNEL_DIVERSITY',
+    },
+  ]
+
   if (!Array.isArray(videos) || videos.length === 0) {
-    return fallback
+    return fallbackPanels
   }
 
   const totalVideos = videos.length
@@ -63,7 +92,9 @@ export function buildMetricsFromVideos(videos, fallback) {
     0,
   )
   const freshVideos = videos.filter((video) =>
-    /(hora|día|dias|dia)/i.test(video.publishedAt ?? ''),
+    /(hora|horas|dia|dias|semana|semanas|mes|meses|hour|hours|day|days|week|weeks|month|months)/i.test(
+      video.publishedAt ?? '',
+    ),
   ).length
   const uniqueAuthors = new Set(
     videos.map((video) => video.author).filter(Boolean),
@@ -76,29 +107,29 @@ export function buildMetricsFromVideos(videos, fallback) {
 
   return [
     {
-      label: 'MONITOR_01: AVG_HYPE',
+      label: copy.avgLabel ?? 'MONITOR_01: AVG_HYPE',
       value: `${avgHypePct}%`,
       width: `${avgHypePct}%`,
-      detail: 'AVERAGE_HYPE_RATIO',
+      detail: copy.avgDetail ?? 'AVERAGE_HYPE_RATIO',
       emphasized: true,
     },
     {
-      label: 'MONITOR_02: TOP_HYPE',
+      label: copy.topLabel ?? 'MONITOR_02: TOP_HYPE',
       value: `${topHypePct}%`,
       width: `${topHypePct}%`,
-      detail: 'BEST_VIDEO_SIGNAL',
+      detail: copy.topDetail ?? 'BEST_VIDEO_SIGNAL',
     },
     {
-      label: 'MONITOR_03: FRESHNESS',
+      label: copy.freshnessLabel ?? 'MONITOR_03: FRESHNESS',
       value: `${freshnessPct}%`,
       width: `${freshnessPct}%`,
-      detail: 'RECENT_PUBLICATIONS',
+      detail: copy.freshnessDetail ?? 'RECENT_PUBLICATIONS',
     },
     {
-      label: 'MONITOR_04: AUTHORS',
+      label: copy.diversityLabel ?? 'MONITOR_04: AUTHORS',
       value: `${diversityPct}%`,
       width: `${diversityPct}%`,
-      detail: 'CHANNEL_DIVERSITY',
+      detail: copy.diversityDetail ?? 'CHANNEL_DIVERSITY',
     },
   ]
 }

@@ -1,0 +1,93 @@
+export const RANKUP_I18N_ES = Object.freeze({
+  api: {
+    offlinePrefix: "API_DESCONECTADA",
+    unknownError: "Error desconocido",
+  },
+  cartridgeSection: {
+    chooseCartridge: "ELIGE TU CARTUCHO",
+    loadingVideos: "CARGANDO CARTUCHOS ...",
+    noCartridges: "NO SE ENCONTRARON CARTUCHOS PARA ESTA BUSQUEDA",
+  },
+  counters: {
+    vectorsSuffix: "CARTUCHOS ENCONTRADOS",
+  },
+  fallback: {
+    noActiveVideo: "SIN_VIDEO_ACTIVO",
+    noDate: "SIN_FECHA",
+    unknown: "DESCONOCIDO",
+    unknownChannel: "CANAL_DESCONOCIDO",
+    untitledVideo: "VIDEO_SIN_TITULO",
+    videoWord: "video",
+  },
+  footer: {
+    credits: "CREDITOS",
+    privacy: "PRIVACIDAD",
+    rights: "(C) 198X-2026 rankup. TODOS LOS DERECHOS RESERVADOS.",
+    rules: "REGLAS",
+    title: "FIN DEL JUEGO?.",
+  },
+  header: {
+    insertCoin: "INSERTAR_MONEDA",
+    languageToggleLabel: "ENG",
+    players: "JUGADORES",
+    scores: "PUNTAJES_ALTOS",
+    searchPlaceholder: "BUSCAR VIDEO...",
+  },
+  hero: {
+    channelPrefix: "CANAL",
+    chip: "VIDEO_DEL_DIA",
+    hypeLabel: "HYPE",
+    liveSignalLabel: "SENAL_HYPE_EN_VIVO",
+    sourceLabel: "FUENTE_TRANSMISION",
+    startButton: "INICIAR_PARTIDA",
+  },
+  loadMore: {
+    loading: "CARGANDO NIVELES...",
+    noMore: "NO HAY MAS NIVELES",
+    withMore: "CARGAR MAS NIVELES",
+  },
+  metricPanels: {
+    avgDetail: "RATIO_HYPE_PROMEDIO",
+    avgLabel: "MEDIDOR-01: HYPE PROMEDIO",
+    diversityDetail: "DIVERSIDAD CANALES",
+    diversityLabel: "MEDIDOR-04: AUTORES",
+    freshnessDetail: "PUBLICACIONES RECIENTES",
+    freshnessLabel: "MEDIDOR-03: RECIENCIA",
+    topDetail: "MEJOR SENAL VIDEO",
+    topLabel: "MEDIDOR-02: HYPE MAXIMO",
+  },
+  modal: {
+    ariaLabel: "Detalles del video",
+    averageShortLabel: "PROM",
+    channelLabel: "CANAL",
+    closeLabel: "Cerrar modal",
+    hypeSignalLabel: "SENAL_HYPE",
+    liveConnectionLabel: "CONEXION_EN_VIVO",
+    logicLabel: "LOGICA_CLASIFICACION",
+    packetLabel: "PAQUETE_DATOS_VIDEO",
+    percentileLabel: "PERCENTIL",
+    positionLabel: "POSICION",
+    publishedLabel: "PUBLICADO",
+    rankingEnergyLabel: "ENERGIA DE CLASIFICACION",
+    sourceIdPrefix: "FUENTE_VIDEO",
+    sourceLabel: "FUENTE",
+    vsAverageLabel: "VS_PROMEDIO",
+  },
+  ranking: {
+    messages: {
+      dominance: "DOMINIO DE SENAL: Este video lidera el tablero arcade.",
+      lowSignal: "ZONA DE SENAL BAJA: Necesita mayor hype de interaccion.",
+      stable:
+        "BUCLE ESTABLE: El rendimiento se mantiene cerca del promedio del muro.",
+      uptrend:
+        "TENDENCIA AL ALZA: El rendimiento sube por encima del promedio de la transmision.",
+    },
+    tiers: {
+      A: "RANGO_A",
+      B: "RANGO_B",
+      C: "RANGO_C",
+      D: "RANGO_D",
+      S: "RANGO_S",
+    },
+  },
+});

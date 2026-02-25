@@ -1,4 +1,5 @@
 import { RANKUP_CONFIG } from '../config'
+import { RANKUP_PLACEHOLDER_TOKENS } from '../i18n'
 
 /**
  * @typedef {Object} RankupApiVideoItem
@@ -33,9 +34,9 @@ function mapApiVideoToCartridge(item) {
 
   return {
     thumbnail: normalizedThumbnail,
-    title: item.title?.trim() || 'UNTITLED_VIDEO',
-    author: item.author?.trim() || 'UNKNOWN_CHANNEL',
-    publishedAt: item.publishedAt?.trim() || 'SIN_FECHA',
+    title: item.title?.trim() || RANKUP_PLACEHOLDER_TOKENS.UNTITLED_VIDEO,
+    author: item.author?.trim() || RANKUP_PLACEHOLDER_TOKENS.UNKNOWN_CHANNEL,
+    publishedAt: item.publishedAt?.trim() || RANKUP_PLACEHOLDER_TOKENS.NO_DATE,
     hype: parsedHype,
   }
 }
@@ -59,12 +60,12 @@ export async function fetchRankupVideos(signal) {
   })
 
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`)
+    throw new Error(`Solicitud fallida con estado ${response.status}`)
   }
 
   const payload = await response.json()
   if (!Array.isArray(payload)) {
-    throw new Error('Videos payload is not an array')
+    throw new Error('La respuesta de videos no es un arreglo')
   }
 
   return payload.map((item) => mapApiVideoToCartridge(item))

@@ -1,5 +1,6 @@
 import { AdaptiveGrid, SectionHeader } from './ui'
 import { EmptyState, LoadMoreAction } from './ux'
+import { resolveI18nValue } from '../i18n'
 
 function toSafeHype(value) {
   if (typeof value !== 'number' || Number.isNaN(value) || value < 0) {
@@ -52,6 +53,7 @@ function getCardVariantClass(index, total, rankMap) {
 }
 
 function RankupCartridgeSection({
+  i18n,
   cartridges,
   countLabel,
   errorMessage,
@@ -66,14 +68,14 @@ function RankupCartridgeSection({
     <section className="svr-cartridge-section">
       <SectionHeader
         className="svr-section-head"
-        title="CHOOSE_YOUR_CARTRIDGE"
+        title={i18n.cartridgeSection.chooseCartridge}
         meta={countLabel}
       />
 
       {isLoading ? (
         <EmptyState
           className="svr-empty-state"
-          message="LOADING_VIDEOS_FROM_API..."
+          message={i18n.cartridgeSection.loadingVideos}
         />
       ) : cartridges.length > 0 ? (
         <AdaptiveGrid className="svr-cartridge-grid" minItemWidth={150} gap={4}>
@@ -94,14 +96,18 @@ function RankupCartridgeSection({
               <div className="svr-card-image" />
               <div className="svr-card-overlay" />
               <div className="svr-card-meta">
-                <h4>{item.title}</h4>
+                <h4>{resolveI18nValue(item.title, i18n.fallback.untitledVideo)}</h4>
                 {(item.author || item.publishedAt || item.hype !== undefined) && (
                   <div className="svr-card-stats">
-                    <span>{item.author ?? 'UNKNOWN'}</span>
+                    <span>{resolveI18nValue(item.author, i18n.fallback.unknown)}</span>
                     <span>{item.hype !== undefined ? `${Math.round(item.hype * 100)}%` : '--'}</span>
                   </div>
                 )}
-                {item.publishedAt ? <div className="svr-card-date">{item.publishedAt}</div> : null}
+                {item.publishedAt ? (
+                  <div className="svr-card-date">
+                    {resolveI18nValue(item.publishedAt, i18n.fallback.noDate)}
+                  </div>
+                ) : null}
               </div>
             </article>
           ))}
@@ -109,13 +115,14 @@ function RankupCartridgeSection({
       ) : (
         <EmptyState
           className="svr-empty-state"
-          message={errorMessage || 'NO_CARTRIDGES_FOUND_FOR_THIS_QUERY'}
+          message={errorMessage || i18n.cartridgeSection.noCartridges}
         />
       )}
 
       <LoadMoreAction
         className="svr-load-more"
         buttonClassName="svr-load-more-button"
+        labels={i18n.loadMore}
         hasMore={hasMore}
         isLoading={isLoading}
         onLoadMore={onLoadMore}

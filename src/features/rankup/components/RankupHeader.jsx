@@ -1,7 +1,12 @@
 import { Button } from './ui'
 import { SearchField } from './ux'
 
-function RankupHeader({ searchTerm, onSearchChange }) {
+function RankupHeader({
+  i18n,
+  searchTerm,
+  onSearchChange,
+  onToggleLanguage,
+}) {
   return (
     <header className="svr-header">
       <div className="svr-header-left">
@@ -12,19 +17,21 @@ function RankupHeader({ searchTerm, onSearchChange }) {
           </h1>
         </div>
         <nav className="svr-nav">
-          <a href="#insert_coin">INSERT_COIN</a>
-          <a href="#hi_scores">HI_SCORES</a>
-          <a href="#players">PLAYERS</a>
+          <a href="#insertar_moneda">{i18n.header.insertCoin}</a>
+          <a href="#puntajes_altos">{i18n.header.scores}</a>
+          <a href="#jugadores">{i18n.header.players}</a>
         </nav>
       </div>
 
       <div className="svr-header-right">
         <SearchField
-          placeholder="FIND_GAME..."
+          placeholder={i18n.header.searchPlaceholder}
           value={searchTerm}
           onChange={onSearchChange}
         />
-        <Button type="button">LOGIN_P1</Button>
+        <Button type="button" onClick={onToggleLanguage}>
+          {i18n.header.languageToggleLabel}
+        </Button>
       </div>
     </header>
   )
