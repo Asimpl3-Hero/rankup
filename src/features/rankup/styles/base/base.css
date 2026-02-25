@@ -1,0 +1,16 @@
+.svr-page {
+  min-height: 100vh;
+  color: #fff;
+  text-transform: uppercase;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  background-color: var(--svr-bg);
+  background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.svr-main {
+  width: min(1600px, 100%);
+  margin: 0 auto;
+  padding: 1rem;
+}

@@ -1,0 +1,34 @@
+.svr-footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-top: 4px solid var(--svr-border);
+  background: #000;
+}
+
+.svr-footer-title {
+  color: var(--svr-primary);
+  font-size: 1.1rem;
+}
+
+.svr-footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.svr-footer-links a {
+  color: var(--svr-muted);
+  text-decoration: none;
+}
+
+.svr-footer-links a:hover {
+  color: var(--svr-secondary);
+}
+
+.svr-footer small {
+  display: block;
+  margin-top: 1rem;
+  color: #5a5a5a;
+  font-size: 0.62rem;
+}

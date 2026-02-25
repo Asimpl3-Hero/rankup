@@ -1,0 +1,105 @@
+.svr-hero {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  border: 4px solid var(--svr-primary);
+  background: var(--svr-surface);
+  box-shadow: 0 0 15px rgb(239 255 0 / 40%);
+}
+
+.svr-hero-image {
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  background:
+    radial-gradient(circle at 20% 25%, rgb(0 255 65 / 22%), transparent 38%),
+    radial-gradient(circle at 80% 70%, rgb(239 255 0 / 20%), transparent 34%),
+    repeating-linear-gradient(
+      135deg,
+      rgb(255 255 255 / 4%) 0 8px,
+      transparent 8px 16px
+    ),
+    linear-gradient(160deg, #0c0c0c 10%, #141414 55%, #090909 100%);
+}
+
+.svr-hero:hover .svr-hero-image {
+  opacity: 1;
+}
+
+.svr-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(0 0 0 / 45%), transparent 30%, rgb(0 0 0 / 90%) 100%);
+}
+
+.svr-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: 420px;
+  padding: 1.5rem;
+}
+
+.svr-chip {
+  display: inline-block;
+  color: #000;
+  padding: 0.45rem 0.55rem;
+  background: var(--svr-primary);
+}
+
+.svr-hero h2 {
+  margin: 1rem 0 0;
+  max-width: 16ch;
+  line-height: 1.35;
+  font-size: clamp(1rem, 2.6vw, 2.2rem);
+  color: var(--svr-primary);
+  text-shadow: 2px 2px 0 #000, 0 0 8px rgb(239 255 0 / 60%);
+}
+
+.svr-hero-footer p {
+  margin: 0;
+  max-width: 72ch;
+  padding: 1rem;
+  line-height: 1.8;
+  color: var(--svr-secondary);
+  border-left: 4px solid var(--svr-secondary);
+  background: rgb(0 0 0 / 80%);
+}
+
+.svr-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+}
+
+.svr-hero-actions button {
+  color: #000;
+  border: 0;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  background: var(--svr-primary);
+  box-shadow: 4px 4px 0 #a5b500;
+}
+
+.svr-score-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--svr-border);
+  background: rgb(0 0 0 / 80%);
+}
+
+.svr-score-box span {
+  color: var(--svr-secondary);
+}
+
+.svr-score-box strong {
+  color: var(--svr-primary);
+}

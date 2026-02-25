@@ -1,0 +1,89 @@
+.svr-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 4px solid var(--svr-primary);
+  background: var(--svr-bg);
+}
+
+.svr-header-left,
+.svr-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.svr-logo-icon {
+  font-size: 2rem;
+  color: var(--svr-secondary);
+}
+
+.svr-logo h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: -0.04em;
+  color: var(--svr-primary);
+  text-shadow: 2px 2px 0 #000, 0 0 8px rgb(239 255 0 / 60%);
+}
+
+.svr-logo h1 span {
+  color: var(--svr-secondary);
+}
+
+.svr-nav {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+}
+
+.svr-nav a {
+  color: var(--svr-muted);
+  text-decoration: none;
+}
+
+.svr-nav a:hover {
+  color: var(--svr-secondary);
+}
+
+.svr-nav a:first-child {
+  color: var(--svr-primary);
+  border-bottom: 2px solid var(--svr-primary);
+  padding-bottom: 0.2rem;
+}
+
+.svr-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.svr-header-right input {
+  display: none;
+  width: 220px;
+  color: #fff;
+  border: 2px solid var(--svr-border);
+  background: var(--svr-surface);
+  padding: 0.7rem;
+  font: inherit;
+  font-size: 0.55rem;
+}
+
+.svr-header-right input:focus {
+  outline: none;
+  border-color: var(--svr-secondary);
+}
+
+.svr-header-right button {
+  color: #000;
+  border: 0;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  background: var(--svr-secondary);
+  box-shadow: 4px 4px 0 #00a130;
+}

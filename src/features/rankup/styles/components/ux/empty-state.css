@@ -1,0 +1,7 @@
+.ux-empty-state {
+  margin: 0;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border: 2px dashed var(--svr-border);
+  color: var(--svr-muted);
+}
