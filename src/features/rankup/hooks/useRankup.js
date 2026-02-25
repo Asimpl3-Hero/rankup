@@ -8,17 +8,57 @@ import {
 } from '../constants'
 import {
   buildVectorsCountLabel,
+  buildMetricsFromVideos,
   filterCartridgesByQuery,
 } from '../utils'
+import { fetchRankupVideos } from '../services'
 
 /** @returns {import('../types').RankupViewModel} */
 export function useRankup() {
   const [searchTerm, setSearchTerm] = useState('')
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_CARTRIDGES)
+  const [videos, setVideos] = useState(CARTRIDGES)
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    const abortController = new AbortController()
+
+    async function loadVideos() {
+      setIsLoading(true)
+      setErrorMessage('')
+
+      try {
+        const apiVideos = await fetchRankupVideos(abortController.signal)
+        setVideos(apiVideos.length > 0 ? apiVideos : CARTRIDGES)
+      } catch (error) {
+        if (abortController.signal.aborted) {
+          return
+        }
+
+        setVideos(CARTRIDGES)
+        setErrorMessage(
+          error instanceof Error
+            ? `API_OFFLINE: ${error.message}`
+            : 'API_OFFLINE: Unknown error',
+        )
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void loadVideos()
+
+    return () => {
+      abortController.abort()
+    }
+  }, [])
 
   const filteredCartridges = useMemo(() => {
-    return filterCartridgesByQuery(CARTRIDGES, searchTerm)
-  }, [searchTerm])
+    return filterCartridgesByQuery(videos, searchTerm)
+  }, [searchTerm, videos])
 
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE_CARTRIDGES)
@@ -30,6 +70,10 @@ export function useRankup() {
   )
 
   const hasMore = visibleCount < filteredCartridges.length
+  const metrics = useMemo(
+    () => buildMetricsFromVideos(videos, METRIC_PANELS),
+    [videos],
+  )
   const countLabel = buildVectorsCountLabel(
     filteredCartridges.length,
     RANKUP_COPY.vectorsFoundSuffix,
@@ -45,8 +89,10 @@ export function useRankup() {
 
   return {
     countLabel,
+    errorMessage,
     hasMore,
-    metrics: METRIC_PANELS,
+    isLoading,
+    metrics,
     searchTerm,
     visibleCartridges,
     handleLoadMore,

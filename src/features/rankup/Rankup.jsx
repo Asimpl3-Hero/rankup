@@ -11,7 +11,9 @@ import { useRankup } from './hooks'
 function Rankup() {
   const {
     countLabel,
+    errorMessage,
     hasMore,
+    isLoading,
     metrics,
     searchTerm,
     visibleCartridges,
@@ -28,14 +30,16 @@ function Rankup() {
 
       <main className="svr-main">
         <section className="svr-hero-grid">
-          <RankupHero />
+          <RankupHero featuredVideo={visibleCartridges[0]} />
           <RankupStatsPanel metrics={metrics} />
         </section>
 
         <RankupCartridgeSection
           cartridges={visibleCartridges}
           countLabel={countLabel}
+          errorMessage={errorMessage}
           hasMore={hasMore}
+          isLoading={isLoading}
           onLoadMore={handleLoadMore}
         />
       </main>

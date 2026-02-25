@@ -4,6 +4,7 @@ function LoadMoreAction({
   buttonClassName = '',
   className = '',
   hasMore,
+  isLoading = false,
   onLoadMore,
 }) {
   const classes = `ux-load-more-action ${className}`.trim()
@@ -14,9 +15,9 @@ function LoadMoreAction({
         className={buttonClassName}
         type="button"
         onClick={onLoadMore}
-        disabled={!hasMore}
+        disabled={!hasMore || isLoading}
       >
-        {hasMore ? 'LOAD_MORE_LEVELS' : 'NO_MORE_LEVELS'}
+        {isLoading ? 'LOADING_LEVELS...' : hasMore ? 'LOAD_MORE_LEVELS' : 'NO_MORE_LEVELS'}
       </Button>
     </div>
   )

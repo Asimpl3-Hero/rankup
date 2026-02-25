@@ -4,7 +4,9 @@ import { EmptyState, LoadMoreAction } from './ux'
 function RankupCartridgeSection({
   cartridges,
   countLabel,
+  errorMessage,
   hasMore,
+  isLoading,
   onLoadMore,
 }) {
   return (
@@ -15,7 +17,12 @@ function RankupCartridgeSection({
         meta={countLabel}
       />
 
-      {cartridges.length > 0 ? (
+      {isLoading ? (
+        <EmptyState
+          className="svr-empty-state"
+          message="LOADING_VIDEOS_FROM_API..."
+        />
+      ) : cartridges.length > 0 ? (
         <AdaptiveGrid className="svr-cartridge-grid" minItemWidth={150} gap={4}>
           {cartridges.map((item) => (
             <article key={item.title} className="svr-card">
@@ -23,12 +30,13 @@ function RankupCartridgeSection({
               <div className="svr-card-overlay" />
               <div className="svr-card-meta">
                 <h4>{item.title}</h4>
-                {(item.views || item.likes) && (
+                {(item.author || item.publishedAt || item.hype !== undefined) && (
                   <div className="svr-card-stats">
-                    <span>{item.views}</span>
-                    <span>{item.likes}</span>
+                    <span>{item.author ?? 'UNKNOWN'}</span>
+                    <span>{item.hype !== undefined ? `${Math.round(item.hype * 100)}%` : '--'}</span>
                   </div>
                 )}
+                {item.publishedAt ? <div className="svr-card-date">{item.publishedAt}</div> : null}
               </div>
             </article>
           ))}
@@ -36,7 +44,7 @@ function RankupCartridgeSection({
       ) : (
         <EmptyState
           className="svr-empty-state"
-          message="NO_CARTRIDGES_FOUND_FOR_THIS_QUERY"
+          message={errorMessage || 'NO_CARTRIDGES_FOUND_FOR_THIS_QUERY'}
         />
       )}
 
@@ -44,6 +52,7 @@ function RankupCartridgeSection({
         className="svr-load-more"
         buttonClassName="svr-load-more-button"
         hasMore={hasMore}
+        isLoading={isLoading}
         onLoadMore={onLoadMore}
       />
     </section>

@@ -10,14 +10,17 @@
 /**
  * @typedef {Object} CartridgeItem
  * @property {string} title
- * @property {string=} views
- * @property {string=} likes
- */
+ * @property {string=} author
+ * @property {string=} publishedAt
+ * @property {number=} hype
+*/
 
 /**
  * @typedef {Object} RankupViewModel
  * @property {string} countLabel
+ * @property {string=} errorMessage
  * @property {boolean} hasMore
+ * @property {boolean} isLoading
  * @property {MetricPanel[]} metrics
  * @property {string} searchTerm
  * @property {CartridgeItem[]} visibleCartridges

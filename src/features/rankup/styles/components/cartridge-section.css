@@ -82,6 +82,12 @@
   font-size: 0.52rem;
 }
 
+.svr-card-date {
+  margin-top: 0.25rem;
+  color: var(--svr-muted);
+  font-size: 0.5rem;
+}
+
 .svr-card:hover {
   border-color: var(--svr-primary);
 }
