@@ -279,16 +279,28 @@
 }
 
 .svr-rank-meter {
+  position: relative;
   margin-top: 0.45rem;
   height: 10px;
   border: 1px solid var(--svr-border);
   background: #050505;
+  overflow: hidden;
 }
 
-.svr-rank-meter > div {
+.svr-rank-meter-value {
   height: 100%;
   background: linear-gradient(90deg, var(--svr-secondary), var(--svr-primary));
   box-shadow: 0 0 12px rgb(0 255 65 / 28%);
+}
+
+.svr-rank-meter-average {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: #fff;
+  opacity: 0.85;
+  box-shadow: 0 0 8px rgb(255 255 255 / 70%);
 }
 
 @media (min-width: 640px) {

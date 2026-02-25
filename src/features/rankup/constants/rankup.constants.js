@@ -1,41 +1,13 @@
 import { RANKUP_CONFIG } from '../config'
 
 /** @typedef {import('../types').CartridgeItem} CartridgeItem */
-/** @typedef {import('../types').MetricPanel} MetricPanel */
 
-const { initialVisibleCartridges, loadMoreStep } = RANKUP_CONFIG
+const { initialVisibleCartridges, loadMoreStep, searchDebounceMs } = RANKUP_CONFIG
 
 export const INITIAL_VISIBLE_CARTRIDGES = initialVisibleCartridges
 export const LOAD_MORE_STEP = loadMoreStep
-
-/** @type {MetricPanel[]} */
-export const METRIC_PANELS = [
-  {
-    label: 'MONITOR_01: VISTAS',
-    value: '40%',
-    width: '40%',
-    detail: 'IMPACTO_PRINCIPAL',
-    emphasized: true,
-  },
-  {
-    label: 'MONITOR_02: ME_GUSTA',
-    value: '30%',
-    width: '30%',
-    detail: 'PODER_SOCIAL',
-  },
-  {
-    label: 'MONITOR_03: COMENTARIOS',
-    value: '20%',
-    width: '20%',
-    detail: 'PROFUNDIDAD_INTERACCION',
-  },
-  {
-    label: 'MONITOR_04: TIEMPO',
-    value: '10%',
-    width: '10%',
-    detail: 'BONUS_RECIENCIA',
-  },
-]
+export const SEARCH_DEBOUNCE_MS = searchDebounceMs
+export const SHUFFLE_SEED_MAX = 1_000_000
 
 /** @type {CartridgeItem[]} */
 export const CARTRIDGES = [

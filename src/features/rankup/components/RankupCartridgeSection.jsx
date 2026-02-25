@@ -1,6 +1,13 @@
-import { AdaptiveGrid, SectionHeader } from './ui'
+import { SectionHeader } from './ui'
 import { EmptyState, LoadMoreAction } from './ux'
 import { resolveI18nValue } from '../i18n'
+import {
+  CARD_TONE_BY_PERCENTILE,
+  CARD_VARIANT_BY_PERCENTILE,
+  DEFAULT_CARD_TONE_CLASS,
+  DEFAULT_CARD_VARIANT_CLASS,
+  HYPE_PERCENT_SCALE,
+} from '../constants'
 
 function toSafeHype(value) {
   if (typeof value !== 'number' || Number.isNaN(value) || value < 0) {
@@ -26,28 +33,19 @@ function buildRankMap(cartridges) {
 
 function getCardVariantClass(index, total, rankMap) {
   if (total <= 0) {
-    return 'svr-card--square svr-card-tone--amber'
+    return `${DEFAULT_CARD_VARIANT_CLASS} ${DEFAULT_CARD_TONE_CLASS}`
   }
 
   const rank = rankMap.get(index) ?? index
   const percentile = rank / total
-  const hypeTier =
-    percentile <= 0.12
-      ? 'svr-card--xl'
-      : percentile <= 0.35
-        ? 'svr-card--tall'
-        : percentile <= 0.7
-          ? 'svr-card--wide'
-          : 'svr-card--square'
-
-  const toneTier =
-    percentile <= 0.25
-      ? 'svr-card-tone--neon'
-      : percentile <= 0.5
-        ? 'svr-card-tone--matrix'
-        : percentile <= 0.75
-          ? 'svr-card-tone--acid'
-          : 'svr-card-tone--amber'
+  const variantRule = CARD_VARIANT_BY_PERCENTILE.find(
+    (rule) => percentile <= rule.maxPercentile,
+  )
+  const toneRule = CARD_TONE_BY_PERCENTILE.find(
+    (rule) => percentile <= rule.maxPercentile,
+  )
+  const hypeTier = variantRule?.className ?? DEFAULT_CARD_VARIANT_CLASS
+  const toneTier = toneRule?.className ?? DEFAULT_CARD_TONE_CLASS
 
   return `${hypeTier} ${toneTier}`
 }
@@ -78,10 +76,10 @@ function RankupCartridgeSection({
           message={i18n.cartridgeSection.loadingVideos}
         />
       ) : cartridges.length > 0 ? (
-        <AdaptiveGrid className="svr-cartridge-grid" minItemWidth={150} gap={4}>
+        <div className="svr-cartridge-grid">
           {cartridges.map((item, index) => (
             <article
-              key={`${item.title}-${index}`}
+              key={item.id ?? `${item.title}-${index}`}
               className={`svr-card ${getCardVariantClass(index, cartridges.length, rankMap)}`}
               role="button"
               tabIndex={0}
@@ -100,7 +98,7 @@ function RankupCartridgeSection({
                 {(item.author || item.publishedAt || item.hype !== undefined) && (
                   <div className="svr-card-stats">
                     <span>{resolveI18nValue(item.author, i18n.fallback.unknown)}</span>
-                    <span>{item.hype !== undefined ? `${Math.round(item.hype * 100)}%` : '--'}</span>
+                    <span>{item.hype !== undefined ? `${Math.round(item.hype * HYPE_PERCENT_SCALE)}%` : '--'}</span>
                   </div>
                 )}
                 {item.publishedAt ? (
@@ -111,7 +109,7 @@ function RankupCartridgeSection({
               </div>
             </article>
           ))}
-        </AdaptiveGrid>
+        </div>
       ) : (
         <EmptyState
           className="svr-empty-state"

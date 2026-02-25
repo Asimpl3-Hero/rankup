@@ -1,11 +1,12 @@
 import { Button } from './ui'
 import { resolveI18nValue } from '../i18n'
+import { HYPE_PERCENT_SCALE } from '../constants'
 
 function RankupHero({ i18n, featuredVideo }) {
   const title = resolveI18nValue(featuredVideo?.title, i18n.fallback.noActiveVideo)
   const author = resolveI18nValue(featuredVideo?.author, i18n.fallback.unknownChannel)
   const publishedAt = resolveI18nValue(featuredVideo?.publishedAt, i18n.fallback.noDate)
-  const hypePercent = Math.round((featuredVideo?.hype ?? 0) * 100)
+  const hypePercent = Math.round((featuredVideo?.hype ?? 0) * HYPE_PERCENT_SCALE)
 
   return (
     <article className="svr-hero">

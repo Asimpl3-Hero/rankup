@@ -1,3 +1,5 @@
+import { HYPE_PERCENT_MAX, HYPE_PERCENT_SCALE } from '../constants'
+
 /**
  * @param {string} value
  * @returns {string}
@@ -40,7 +42,7 @@ function toSafePercent(value) {
     return 0
   }
 
-  return Math.min(100, Math.round(value))
+  return Math.min(HYPE_PERCENT_MAX, Math.round(value))
 }
 
 /**
@@ -100,10 +102,10 @@ export function buildMetricsFromVideos(videos, metricPanelsCopy) {
     videos.map((video) => video.author).filter(Boolean),
   ).size
 
-  const avgHypePct = toSafePercent((totalHype / totalVideos) * 100)
-  const topHypePct = toSafePercent(topHype * 100)
-  const freshnessPct = toSafePercent((freshVideos / totalVideos) * 100)
-  const diversityPct = toSafePercent((uniqueAuthors / totalVideos) * 100)
+  const avgHypePct = toSafePercent((totalHype / totalVideos) * HYPE_PERCENT_SCALE)
+  const topHypePct = toSafePercent(topHype * HYPE_PERCENT_SCALE)
+  const freshnessPct = toSafePercent((freshVideos / totalVideos) * HYPE_PERCENT_SCALE)
+  const diversityPct = toSafePercent((uniqueAuthors / totalVideos) * HYPE_PERCENT_SCALE)
 
   return [
     {
@@ -145,6 +147,34 @@ function hashString(value) {
     hash |= 0
   }
   return Math.abs(hash)
+}
+
+/**
+ * @param {import('../types').CartridgeItem[]} cartridges
+ * @returns {import('../types').CartridgeItem[]}
+ */
+export function withStableCartridgeIds(cartridges) {
+  const ids = new Set()
+
+  return cartridges.map((item, index) => {
+    const existingId =
+      typeof item.id === 'string' && item.id.trim()
+        ? item.id.trim()
+        : ''
+    const fallbackSource = `${item.title ?? ''}|${item.author ?? ''}|${item.publishedAt ?? ''}|${item.hype ?? ''}|${index}`
+    const fallbackId = `video_${hashString(fallbackSource)}`
+    let normalizedId = existingId || fallbackId
+
+    if (ids.has(normalizedId)) {
+      normalizedId = `${normalizedId}_${index}`
+    }
+
+    ids.add(normalizedId)
+    return {
+      ...item,
+      id: normalizedId,
+    }
+  })
 }
 
 /**

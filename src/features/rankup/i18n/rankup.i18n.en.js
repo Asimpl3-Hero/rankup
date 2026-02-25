@@ -59,6 +59,7 @@ export const RANKUP_I18N_EN = Object.freeze({
   modal: {
     ariaLabel: 'Video details',
     averageShortLabel: 'AVG',
+    currentShortLabel: 'NOW',
     channelLabel: 'CHANNEL',
     closeLabel: 'Close modal',
     hypeSignalLabel: 'HYPE_SIGNAL',

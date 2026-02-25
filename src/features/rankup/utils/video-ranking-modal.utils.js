@@ -1,3 +1,10 @@
+import {
+  HYPE_PERCENT_MAX,
+  HYPE_PERCENT_SCALE,
+  RANKING_SIGNAL_THRESHOLDS,
+  RANKING_TIER_BY_HYPE_PERCENT,
+} from '../constants'
+
 function toSafeHype(value) {
   if (typeof value !== 'number' || Number.isNaN(value) || value < 0) {
     return 0
@@ -7,14 +14,18 @@ function toSafeHype(value) {
 }
 
 function toSafePercent(hype) {
-  return Math.min(100, Math.round(toSafeHype(hype) * 100))
+  return Math.min(HYPE_PERCENT_MAX, Math.round(toSafeHype(hype) * HYPE_PERCENT_SCALE))
 }
 
 function getTierByHypePercent(hypePercent) {
-  if (hypePercent >= 80) return 'S'
-  if (hypePercent >= 65) return 'A'
-  if (hypePercent >= 45) return 'B'
-  if (hypePercent >= 25) return 'C'
+  const matchedTier = RANKING_TIER_BY_HYPE_PERCENT.find(
+    (rule) => hypePercent >= rule.minHypePercent,
+  )
+
+  if (matchedTier) {
+    return matchedTier.tier
+  }
+
   return 'D'
 }
 
@@ -30,48 +41,66 @@ function getRankingMessage(tier, deltaVsAverage, rankingCopy) {
   if (tier === 'S') {
     return rankingCopy?.messages?.dominance ?? 'SIGNAL_DOMINANCE'
   }
-  if (deltaVsAverage >= 10) {
+  if (deltaVsAverage >= RANKING_SIGNAL_THRESHOLDS.uptrendDelta) {
     return rankingCopy?.messages?.uptrend ?? 'UPTREND_DETECTED'
   }
-  if (deltaVsAverage <= -10) {
+  if (deltaVsAverage <= RANKING_SIGNAL_THRESHOLDS.lowSignalDelta) {
     return rankingCopy?.messages?.lowSignal ?? 'LOW_SIGNAL_ZONE'
   }
   return rankingCopy?.messages?.stable ?? 'STABLE_LOOP'
 }
 
 /**
+ * @param {import('../types').CartridgeItem} left
+ * @param {import('../types').CartridgeItem} right
+ * @returns {boolean}
+ */
+function isSameVideo(left, right) {
+  if (left.id && right.id) {
+    return left.id === right.id
+  }
+
+  return (
+    left.title === right.title &&
+    (left.author ?? '') === (right.author ?? '') &&
+    (left.publishedAt ?? '') === (right.publishedAt ?? '')
+  )
+}
+
+/**
  * @param {import('../types').CartridgeItem} video
  * @param {import('../types').CartridgeItem[]=} rankingPool
- * @param {{ tiers?: Record<string, string>, messages?: Record<string, string> }=} rankingCopy
+ * @param {import('../types').RankupRankingCopy=} rankingCopy
  */
 export function buildVideoRankingContext(video, rankingPool, rankingCopy) {
-  const normalizedPool =
+  const basePool =
     Array.isArray(rankingPool) && rankingPool.length > 0
       ? rankingPool
       : [video]
+  const hasSelectedVideo = basePool.some((item) => isSameVideo(item, video))
+  const normalizedPool = hasSelectedVideo
+    ? basePool
+    : [...basePool, video]
 
   const sortedByHype = [...normalizedPool].sort(
     (left, right) => toSafeHype(right.hype) - toSafeHype(left.hype),
   )
   const totalItems = sortedByHype.length
   const rankIndex = sortedByHype.findIndex(
-    (item) =>
-      item.title === video.title &&
-      (item.author ?? '') === (video.author ?? '') &&
-      (item.publishedAt ?? '') === (video.publishedAt ?? ''),
+    (item) => isSameVideo(item, video),
   )
-  const position = rankIndex >= 0 ? rankIndex + 1 : totalItems
+  const position = rankIndex >= 0 ? rankIndex + 1 : 1
   const hypePercent = toSafePercent(video.hype)
   const percentile =
     totalItems <= 1
-      ? 100
-      : Math.max(0, Math.round(((totalItems - position) / (totalItems - 1)) * 100))
+      ? HYPE_PERCENT_MAX
+      : Math.max(0, Math.round(((totalItems - position) / (totalItems - 1)) * HYPE_PERCENT_SCALE))
 
   const averageHype =
     normalizedPool.reduce((sum, item) => sum + toSafeHype(item.hype), 0) /
     Math.max(1, totalItems)
-  const averageHypePercent = Math.round(averageHype * 100)
-  const deltaVsAverage = Math.round((toSafeHype(video.hype) - averageHype) * 100)
+  const averageHypePercent = Math.round(averageHype * HYPE_PERCENT_SCALE)
+  const deltaVsAverage = Math.round((toSafeHype(video.hype) - averageHype) * HYPE_PERCENT_SCALE)
   const tier = getTierByHypePercent(hypePercent)
 
   return {

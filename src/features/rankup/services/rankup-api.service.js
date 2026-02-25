@@ -1,14 +1,6 @@
 import { RANKUP_CONFIG } from '../config'
 import { RANKUP_PLACEHOLDER_TOKENS } from '../i18n'
-
-/**
- * @typedef {Object} RankupApiVideoItem
- * @property {string} [thumbnail]
- * @property {string} [title]
- * @property {string} [author]
- * @property {string} [publishedAt]
- * @property {number} [hype]
- */
+import { HYPE_PERCENT_MAX, HYPE_UNIT_MAX } from '../constants'
 
 /**
  * @param {string} baseUrl
@@ -22,23 +14,42 @@ function buildEndpointUrl(baseUrl, endpoint) {
 }
 
 /**
- * @param {RankupApiVideoItem} item
+ * @param {import('../types').RankupApiVideoItem} item
  * @returns {import('../types').CartridgeItem}
  */
 function mapApiVideoToCartridge(item) {
-  const parsedHype =
-    typeof item.hype === 'number' && Number.isFinite(item.hype) && item.hype >= 0
-      ? item.hype
-      : 0
+  const parsedHype = toNormalizedHype(item.hype)
+  const normalizedId = item.id?.trim() || undefined
   const normalizedThumbnail = item.thumbnail?.trim() || undefined
 
   return {
+    id: normalizedId,
     thumbnail: normalizedThumbnail,
     title: item.title?.trim() || RANKUP_PLACEHOLDER_TOKENS.UNTITLED_VIDEO,
     author: item.author?.trim() || RANKUP_PLACEHOLDER_TOKENS.UNKNOWN_CHANNEL,
     publishedAt: item.publishedAt?.trim() || RANKUP_PLACEHOLDER_TOKENS.NO_DATE,
     hype: parsedHype,
   }
+}
+
+/**
+ * @param {number=} value
+ * @returns {number}
+ */
+function toNormalizedHype(value) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+    return 0
+  }
+
+  if (value <= HYPE_UNIT_MAX) {
+    return value
+  }
+
+  if (value <= HYPE_PERCENT_MAX) {
+    return value / HYPE_PERCENT_MAX
+  }
+
+  return HYPE_UNIT_MAX
 }
 
 /**

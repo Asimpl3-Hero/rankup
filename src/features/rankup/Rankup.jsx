@@ -22,6 +22,7 @@ function Rankup() {
     hasMore,
     isLoading,
     metrics,
+    rankingPool,
     searchTerm,
     visibleCartridges,
     handleLoadMore,
@@ -68,7 +69,7 @@ function Rankup() {
       <VideoInfoModal
         isOpen={Boolean(selectedVideo)}
         i18n={i18n}
-        rankingPool={visibleCartridges}
+        rankingPool={rankingPool}
         video={selectedVideo}
         onClose={() => setSelectedVideo(null)}
       />

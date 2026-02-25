@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react'
 import { Button } from '../ui'
 import { buildVideoRankingContext } from '../../utils'
 import { resolveI18nValue } from '../../i18n'
+import {
+  MODAL_REC_TIME,
+  MODAL_SOURCE_ID_PAD_LENGTH,
+  MODAL_TIME_PAD_LENGTH,
+} from '../../constants'
 
 function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
   const [isPreviewBroken, setIsPreviewBroken] = useState(false)
@@ -40,14 +45,20 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
     typeof video.thumbnail === 'string' &&
     video.thumbnail.trim().length > 0 &&
     !isPreviewBroken
-  const sourceId = `${i18n.modal.sourceIdPrefix}_${String(ranking.position).padStart(2, '0')}`
+  const sourceId = `${i18n.modal.sourceIdPrefix}_${String(ranking.position).padStart(MODAL_SOURCE_ID_PAD_LENGTH, '0')}`
   const title = resolveI18nValue(video.title, i18n.fallback.untitledVideo)
   const author = resolveI18nValue(video.author, i18n.fallback.unknownChannel)
   const publishedAt = resolveI18nValue(video.publishedAt, i18n.fallback.noDate)
-  const recMinutes = String((ranking.position * 3 + ranking.hypePercent) % 60).padStart(2, '0')
-  const recSeconds = String((ranking.hypePercent * 2 + ranking.totalItems) % 60).padStart(2, '0')
-  const recFrames = String((ranking.percentile + ranking.position) % 30).padStart(2, '0')
-  const recStamp = `00:${recMinutes}:${recSeconds}:${recFrames}`
+  const recMinutes = String(
+    (ranking.position * MODAL_REC_TIME.minutesWeight + ranking.hypePercent) % MODAL_REC_TIME.minutesMod,
+  ).padStart(MODAL_TIME_PAD_LENGTH, '0')
+  const recSeconds = String(
+    (ranking.hypePercent * MODAL_REC_TIME.secondsWeight + ranking.totalItems) % MODAL_REC_TIME.secondsMod,
+  ).padStart(MODAL_TIME_PAD_LENGTH, '0')
+  const recFrames = String(
+    (ranking.percentile + ranking.position) % MODAL_REC_TIME.framesMod,
+  ).padStart(MODAL_TIME_PAD_LENGTH, '0')
+  const recStamp = `${MODAL_REC_TIME.basePrefix}:${recMinutes}:${recSeconds}:${recFrames}`
 
   return (
     <div className="svr-modal-backdrop" role="presentation" onClick={onClose}>
@@ -140,10 +151,15 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
               <div className="svr-rank-meter-wrap">
                 <div className="svr-rank-meter-label">
                   <span>{i18n.modal.rankingEnergyLabel}</span>
-                  <span>{ranking.averageHypePercent}% {i18n.modal.averageShortLabel}</span>
+                  <span>
+                    {ranking.hypePercent}% {i18n.modal.currentShortLabel}
+                    {' | '}
+                    {ranking.averageHypePercent}% {i18n.modal.averageShortLabel}
+                  </span>
                 </div>
                 <div className="svr-rank-meter">
-                  <div style={{ width: `${ranking.hypePercent}%` }} />
+                  <div className="svr-rank-meter-value" style={{ width: `${ranking.hypePercent}%` }} />
+                  <div className="svr-rank-meter-average" style={{ left: `${ranking.averageHypePercent}%` }} />
                 </div>
               </div>
 

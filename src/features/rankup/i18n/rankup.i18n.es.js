@@ -9,7 +9,7 @@ export const RANKUP_I18N_ES = Object.freeze({
     noCartridges: "NO SE ENCONTRARON CARTUCHOS PARA ESTA BUSQUEDA",
   },
   counters: {
-    vectorsSuffix: "CARTUCHOS ENCONTRADOS",
+    vectorsSuffix: " CARTUCHOS ENCONTRADOS",
   },
   fallback: {
     noActiveVideo: "SIN_VIDEO_ACTIVO",
@@ -59,6 +59,7 @@ export const RANKUP_I18N_ES = Object.freeze({
   modal: {
     ariaLabel: "Detalles del video",
     averageShortLabel: "PROM",
+    currentShortLabel: "ACT",
     channelLabel: "CANAL",
     closeLabel: "Cerrar modal",
     hypeSignalLabel: "SENAL_HYPE",
