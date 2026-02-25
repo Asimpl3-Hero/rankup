@@ -20,10 +20,6 @@
   .svr-hero-grid {
     grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
   }
-
-  .svr-cartridge-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
 }
 
 @media (min-width: 1220px) {

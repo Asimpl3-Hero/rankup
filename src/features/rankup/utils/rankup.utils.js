@@ -102,3 +102,55 @@ export function buildMetricsFromVideos(videos, fallback) {
     },
   ]
 }
+
+/**
+ * @param {string} value
+ * @returns {number}
+ */
+function hashString(value) {
+  let hash = 0
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(index)
+    hash |= 0
+  }
+  return Math.abs(hash)
+}
+
+/**
+ * @param {import('../types').CartridgeItem[]} cartridges
+ * @param {number} seed
+ * @returns {import('../types').CartridgeItem[]}
+ */
+export function shuffleCartridgesBySeed(cartridges, seed) {
+  return [...cartridges]
+    .map((item, index) => ({
+      item,
+      score: hashString(`${seed}:${item.title}:${index}`),
+    }))
+    .sort((left, right) => left.score - right.score)
+    .map((entry) => entry.item)
+}
+
+/**
+ * @param {import('../types').CartridgeItem[]} cartridges
+ * @returns {import('../types').CartridgeItem[]}
+ */
+export function placeTopHypeFirst(cartridges) {
+  if (cartridges.length < 2) {
+    return cartridges
+  }
+
+  const maxHype = cartridges.reduce(
+    (maxValue, item) => Math.max(maxValue, item.hype ?? 0),
+    0,
+  )
+  const topIndex = cartridges.findIndex((item) => (item.hype ?? 0) === maxHype)
+  if (topIndex <= 0) {
+    return cartridges
+  }
+
+  const next = [...cartridges]
+  const [topItem] = next.splice(topIndex, 1)
+  next.unshift(topItem)
+  return next
+}

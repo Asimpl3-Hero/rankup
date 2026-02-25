@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import './styles/index.css'
 import {
   RankupCartridgeSection,
@@ -5,10 +6,13 @@ import {
   RankupHeader,
   RankupHero,
   RankupStatsPanel,
+  VideoInfoModal,
 } from './components'
 import { useRankup } from './hooks'
 
 function Rankup() {
+  const [selectedVideo, setSelectedVideo] = useState(null)
+
   const {
     countLabel,
     errorMessage,
@@ -41,10 +45,18 @@ function Rankup() {
           hasMore={hasMore}
           isLoading={isLoading}
           onLoadMore={handleLoadMore}
+          onSelectVideo={setSelectedVideo}
         />
       </main>
 
       <RankupFooter />
+
+      <VideoInfoModal
+        isOpen={Boolean(selectedVideo)}
+        rankingPool={visibleCartridges}
+        video={selectedVideo}
+        onClose={() => setSelectedVideo(null)}
+      />
     </div>
   )
 }

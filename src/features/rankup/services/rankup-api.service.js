@@ -29,8 +29,10 @@ function mapApiVideoToCartridge(item) {
     typeof item.hype === 'number' && Number.isFinite(item.hype) && item.hype >= 0
       ? item.hype
       : 0
+  const normalizedThumbnail = item.thumbnail?.trim() || undefined
 
   return {
+    thumbnail: normalizedThumbnail,
     title: item.title?.trim() || 'UNTITLED_VIDEO',
     author: item.author?.trim() || 'UNKNOWN_CHANNEL',
     publishedAt: item.publishedAt?.trim() || 'SIN_FECHA',

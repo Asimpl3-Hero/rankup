@@ -1,6 +1,56 @@
 import { AdaptiveGrid, SectionHeader } from './ui'
 import { EmptyState, LoadMoreAction } from './ux'
 
+function toSafeHype(value) {
+  if (typeof value !== 'number' || Number.isNaN(value) || value < 0) {
+    return 0
+  }
+
+  return value
+}
+
+function buildRankMap(cartridges) {
+  const rankedIndexes = [...cartridges.keys()].sort(
+    (leftIndex, rightIndex) =>
+      toSafeHype(cartridges[rightIndex]?.hype) - toSafeHype(cartridges[leftIndex]?.hype),
+  )
+
+  const rankMap = new Map()
+  rankedIndexes.forEach((index, rank) => {
+    rankMap.set(index, rank)
+  })
+
+  return rankMap
+}
+
+function getCardVariantClass(index, total, rankMap) {
+  if (total <= 0) {
+    return 'svr-card--square svr-card-tone--amber'
+  }
+
+  const rank = rankMap.get(index) ?? index
+  const percentile = rank / total
+  const hypeTier =
+    percentile <= 0.12
+      ? 'svr-card--xl'
+      : percentile <= 0.35
+        ? 'svr-card--tall'
+        : percentile <= 0.7
+          ? 'svr-card--wide'
+          : 'svr-card--square'
+
+  const toneTier =
+    percentile <= 0.25
+      ? 'svr-card-tone--neon'
+      : percentile <= 0.5
+        ? 'svr-card-tone--matrix'
+        : percentile <= 0.75
+          ? 'svr-card-tone--acid'
+          : 'svr-card-tone--amber'
+
+  return `${hypeTier} ${toneTier}`
+}
+
 function RankupCartridgeSection({
   cartridges,
   countLabel,
@@ -8,7 +58,10 @@ function RankupCartridgeSection({
   hasMore,
   isLoading,
   onLoadMore,
+  onSelectVideo,
 }) {
+  const rankMap = buildRankMap(cartridges)
+
   return (
     <section className="svr-cartridge-section">
       <SectionHeader
@@ -24,8 +77,20 @@ function RankupCartridgeSection({
         />
       ) : cartridges.length > 0 ? (
         <AdaptiveGrid className="svr-cartridge-grid" minItemWidth={150} gap={4}>
-          {cartridges.map((item) => (
-            <article key={item.title} className="svr-card">
+          {cartridges.map((item, index) => (
+            <article
+              key={`${item.title}-${index}`}
+              className={`svr-card ${getCardVariantClass(index, cartridges.length, rankMap)}`}
+              role="button"
+              tabIndex={0}
+              onClick={() => onSelectVideo?.(item)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  onSelectVideo?.(item)
+                }
+              }}
+            >
               <div className="svr-card-image" />
               <div className="svr-card-overlay" />
               <div className="svr-card-meta">

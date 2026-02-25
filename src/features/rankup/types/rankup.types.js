@@ -10,6 +10,7 @@
 /**
  * @typedef {Object} CartridgeItem
  * @property {string} title
+ * @property {string=} thumbnail
  * @property {string=} author
  * @property {string=} publishedAt
  * @property {number=} hype

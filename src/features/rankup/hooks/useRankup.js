@@ -10,6 +10,8 @@ import {
   buildVectorsCountLabel,
   buildMetricsFromVideos,
   filterCartridgesByQuery,
+  placeTopHypeFirst,
+  shuffleCartridgesBySeed,
 } from '../utils'
 import { fetchRankupVideos } from '../services'
 
@@ -18,6 +20,7 @@ export function useRankup() {
   const [searchTerm, setSearchTerm] = useState('')
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_CARTRIDGES)
   const [videos, setVideos] = useState(CARTRIDGES)
+  const [shuffleSeed] = useState(() => Math.floor(Math.random() * 1_000_000))
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -56,9 +59,19 @@ export function useRankup() {
     }
   }, [])
 
+  const shuffledVideos = useMemo(
+    () => shuffleCartridgesBySeed(videos, shuffleSeed),
+    [videos, shuffleSeed],
+  )
+
+  const arrangedVideos = useMemo(
+    () => placeTopHypeFirst(shuffledVideos),
+    [shuffledVideos],
+  )
+
   const filteredCartridges = useMemo(() => {
-    return filterCartridgesByQuery(videos, searchTerm)
-  }, [searchTerm, videos])
+    return filterCartridgesByQuery(arrangedVideos, searchTerm)
+  }, [arrangedVideos, searchTerm])
 
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE_CARTRIDGES)
