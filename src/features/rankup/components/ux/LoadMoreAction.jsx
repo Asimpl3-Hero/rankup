@@ -4,9 +4,9 @@ function LoadMoreAction({
   buttonClassName = '',
   className = '',
   labels = {
-    loading: 'LOADING...',
-    noMore: 'NO_MORE',
-    withMore: 'LOAD_MORE',
+    loading: 'CARGANDO...',
+    noMore: 'SIN_MAS_RESULTADOS',
+    withMore: 'CARGAR_MAS',
   },
   hasMore,
   isLoading = false,

@@ -21,10 +21,12 @@ function mapApiVideoToCartridge(item) {
   const parsedHype = toNormalizedHype(item.hype)
   const normalizedId = item.id?.trim() || undefined
   const normalizedThumbnail = item.thumbnail?.trim() || undefined
+  const normalizedVideoUrl = item.videoUrl?.trim() || item.video?.trim() || item.mediaUrl?.trim() || undefined
 
   return {
     id: normalizedId,
     thumbnail: normalizedThumbnail,
+    videoUrl: normalizedVideoUrl,
     title: item.title?.trim() || RANKUP_PLACEHOLDER_TOKENS.UNTITLED_VIDEO,
     author: item.author?.trim() || RANKUP_PLACEHOLDER_TOKENS.UNKNOWN_CHANNEL,
     publishedAt: item.publishedAt?.trim() || RANKUP_PLACEHOLDER_TOKENS.NO_DATE,

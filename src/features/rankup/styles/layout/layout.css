@@ -13,7 +13,7 @@
     padding-inline: 2rem;
   }
 
-  .svr-header-right input {
+  .svr-header-right .ux-search-field {
     display: block;
   }
 

@@ -1,7 +1,21 @@
 .ux-empty-state {
+  position: relative;
+  overflow: hidden;
   margin: 0;
   padding: 1.25rem 1rem;
   text-align: center;
   border: 2px dashed var(--svr-border);
   color: var(--svr-muted);
+  background: rgb(0 0 0 / 48%);
+  animation: svr-section-in 360ms ease-out both;
+}
+
+.ux-empty-state::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.45;
+  background: linear-gradient(125deg, transparent 0 35%, rgb(255 255 255 / 12%) 50%, transparent 65% 100%);
+  animation: svr-shimmer-sweep 900ms ease-out 1;
 }

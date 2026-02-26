@@ -46,3 +46,29 @@ export function resolveI18nValue(value, fallbackText) {
 
   return placeholderSet.has(normalized) ? fallbackText : normalized
 }
+
+function normalizeRelativeTimeKey(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ')
+}
+
+/**
+ * @param {string=} value
+ * @param {import('../types').RankupI18n=} i18n
+ * @param {string} fallbackText
+ * @returns {string}
+ */
+export function resolvePublishedAtValue(value, i18n, fallbackText) {
+  const normalized = value?.trim()
+  if (!normalized) {
+    return fallbackText
+  }
+
+  const localized =
+    i18n?.relativeTime?.[normalizeRelativeTimeKey(normalized)]
+
+  if (typeof localized === 'string' && localized.trim()) {
+    return localized
+  }
+
+  return resolveI18nValue(normalized, fallbackText)
+}

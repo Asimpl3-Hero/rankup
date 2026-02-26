@@ -12,3 +12,11 @@ export const CARD_TONE_BY_PERCENTILE = Object.freeze([
   { maxPercentile: 0.5, className: 'svr-card-tone--matrix' },
   { maxPercentile: 0.75, className: 'svr-card-tone--acid' },
 ])
+
+export const GRID_FALLBACK_VIDEO_SOURCES = Object.freeze([
+  '/videos/Grid/1.mp4',
+  '/videos/Grid/2.mp4',
+  '/videos/Grid/3.mp4',
+  '/videos/Grid/4.mp4',
+  '/videos/Grid/5.mp4',
+])

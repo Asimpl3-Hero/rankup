@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   INITIAL_VISIBLE_CARTRIDGES,
   LOAD_MORE_STEP,
@@ -36,10 +36,6 @@ export function useRankupFeed(videos) {
     return filterCartridgesByQuery(arrangedVideos, debouncedSearchTerm)
   }, [arrangedVideos, debouncedSearchTerm])
 
-  useEffect(() => {
-    setVisibleCount(INITIAL_VISIBLE_CARTRIDGES)
-  }, [debouncedSearchTerm])
-
   const visibleCartridges = useMemo(
     () => filteredCartridges.slice(0, visibleCount),
     [filteredCartridges, visibleCount],
@@ -47,6 +43,7 @@ export function useRankupFeed(videos) {
 
   function handleSearchChange(event) {
     setSearchTerm(event.target.value)
+    setVisibleCount(INITIAL_VISIBLE_CARTRIDGES)
   }
 
   function handleLoadMore() {

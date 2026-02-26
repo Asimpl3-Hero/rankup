@@ -1,4 +1,5 @@
 export * from './useDebouncedValue'
 export * from './useRankup'
 export * from './useRankupFeed'
+export * from './useRankupSound'
 export * from './useRankupVideos'

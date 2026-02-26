@@ -8,6 +8,7 @@ export const INITIAL_VISIBLE_CARTRIDGES = initialVisibleCartridges
 export const LOAD_MORE_STEP = loadMoreStep
 export const SEARCH_DEBOUNCE_MS = searchDebounceMs
 export const SHUFFLE_SEED_MAX = 1_000_000
+export const HERO_FALLBACK_VIDEO_SRC = '/videos/Hero-Video.mp4'
 
 /** @type {CartridgeItem[]} */
 export const CARTRIDGES = [

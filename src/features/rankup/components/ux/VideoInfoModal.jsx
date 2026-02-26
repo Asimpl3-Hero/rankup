@@ -1,15 +1,53 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Button } from '../ui'
 import { buildVideoRankingContext } from '../../utils'
-import { resolveI18nValue } from '../../i18n'
+import { resolveI18nValue, resolvePublishedAtValue } from '../../i18n'
 import {
   MODAL_REC_TIME,
   MODAL_SOURCE_ID_PAD_LENGTH,
   MODAL_TIME_PAD_LENGTH,
 } from '../../constants'
 
+function toMeterScale(percent) {
+  if (!Number.isFinite(percent)) {
+    return '0'
+  }
+
+  return String(Math.max(0, Math.min(1, percent / 100)))
+}
+
+function toPercentOffset(percent) {
+  if (!Number.isFinite(percent)) {
+    return '0%'
+  }
+
+  return `${Math.max(0, Math.min(100, percent))}%`
+}
+
+function getFocusableElements(container) {
+  if (!container) {
+    return []
+  }
+
+  const selector = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(',')
+
+  return Array.from(container.querySelectorAll(selector)).filter(
+    (element) => element instanceof HTMLElement && !element.hasAttribute('aria-hidden'),
+  )
+}
+
 function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
-  const [isPreviewBroken, setIsPreviewBroken] = useState(false)
+  const [brokenPreviewThumbnail, setBrokenPreviewThumbnail] = useState('')
+  const modalRef = useRef(null)
+  const previousFocusedElementRef = useRef(null)
 
   useEffect(() => {
     if (!isOpen) {
@@ -17,24 +55,70 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
     }
 
     const originalOverflow = document.body.style.overflow
+    const originalPaddingRight = document.body.style.paddingRight
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+    const computedBodyPaddingRight =
+      Number.parseFloat(window.getComputedStyle(document.body).paddingRight) || 0
+
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${computedBodyPaddingRight + scrollbarWidth}px`
+    }
+
     document.body.style.overflow = 'hidden'
+
+    const modalNode = modalRef.current
+    previousFocusedElementRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
+
+    const focusableElements = getFocusableElements(modalNode)
+    if (focusableElements.length > 0) {
+      focusableElements[0].focus()
+    } else {
+      modalNode?.focus()
+    }
 
     function onKeyDown(event) {
       if (event.key === 'Escape') {
+        event.preventDefault()
         onClose?.()
+        return
+      }
+
+      if (event.key !== 'Tab') {
+        return
+      }
+
+      const currentFocusableElements = getFocusableElements(modalNode)
+      if (currentFocusableElements.length === 0) {
+        event.preventDefault()
+        modalNode?.focus()
+        return
+      }
+
+      const firstFocusable = currentFocusableElements[0]
+      const lastFocusable = currentFocusableElements[currentFocusableElements.length - 1]
+      const activeElement = document.activeElement
+
+      if (event.shiftKey && activeElement === firstFocusable) {
+        event.preventDefault()
+        lastFocusable.focus()
+        return
+      }
+
+      if (!event.shiftKey && activeElement === lastFocusable) {
+        event.preventDefault()
+        firstFocusable.focus()
       }
     }
 
-    window.addEventListener('keydown', onKeyDown)
+    document.addEventListener('keydown', onKeyDown)
     return () => {
-      window.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('keydown', onKeyDown)
       document.body.style.overflow = originalOverflow
+      document.body.style.paddingRight = originalPaddingRight
+      previousFocusedElementRef.current?.focus()
     }
   }, [isOpen, onClose])
-
-  useEffect(() => {
-    setIsPreviewBroken(false)
-  }, [isOpen, video?.thumbnail])
 
   if (!isOpen || !video) {
     return null
@@ -44,11 +128,11 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
   const hasPreviewImage =
     typeof video.thumbnail === 'string' &&
     video.thumbnail.trim().length > 0 &&
-    !isPreviewBroken
+    brokenPreviewThumbnail !== video.thumbnail
   const sourceId = `${i18n.modal.sourceIdPrefix}_${String(ranking.position).padStart(MODAL_SOURCE_ID_PAD_LENGTH, '0')}`
   const title = resolveI18nValue(video.title, i18n.fallback.untitledVideo)
   const author = resolveI18nValue(video.author, i18n.fallback.unknownChannel)
-  const publishedAt = resolveI18nValue(video.publishedAt, i18n.fallback.noDate)
+  const publishedAt = resolvePublishedAtValue(video.publishedAt, i18n, i18n.fallback.noDate)
   const recMinutes = String(
     (ranking.position * MODAL_REC_TIME.minutesWeight + ranking.hypePercent) % MODAL_REC_TIME.minutesMod,
   ).padStart(MODAL_TIME_PAD_LENGTH, '0')
@@ -60,13 +144,15 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
   ).padStart(MODAL_TIME_PAD_LENGTH, '0')
   const recStamp = `${MODAL_REC_TIME.basePrefix}:${recMinutes}:${recSeconds}:${recFrames}`
 
-  return (
+  const modalContent = (
     <div className="svr-modal-backdrop" role="presentation" onClick={onClose}>
       <section
         className="svr-modal"
         role="dialog"
         aria-modal="true"
         aria-label={i18n.modal.ariaLabel}
+        tabIndex={-1}
+        ref={modalRef}
         onClick={(event) => event.stopPropagation()}
       >
         <header className="svr-modal-header">
@@ -91,7 +177,7 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
                     src={video.thumbnail}
                     alt={`${i18n.modal.ariaLabel}: ${title || i18n.fallback.videoWord}`}
                     loading="lazy"
-                    onError={() => setIsPreviewBroken(true)}
+                    onError={() => setBrokenPreviewThumbnail(video.thumbnail)}
                   />
                 ) : (
                   <div className="svr-modal-preview-placeholder" aria-hidden="true" />
@@ -101,7 +187,7 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
                   <span />
                 </div>
 
-                <div className="svr-modal-preview-rec">REC [{recStamp}]</div>
+                <div className="svr-modal-preview-rec">{i18n.modal.recordingLabel} [{recStamp}]</div>
               </div>
 
               <div className="svr-modal-preview-meta">
@@ -157,9 +243,15 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
                     {ranking.averageHypePercent}% {i18n.modal.averageShortLabel}
                   </span>
                 </div>
-                <div className="svr-rank-meter">
-                  <div className="svr-rank-meter-value" style={{ width: `${ranking.hypePercent}%` }} />
-                  <div className="svr-rank-meter-average" style={{ left: `${ranking.averageHypePercent}%` }} />
+                <div
+                  className="svr-rank-meter"
+                  style={{
+                    '--svr-rank-meter-scale': toMeterScale(ranking.hypePercent),
+                    '--svr-rank-average-position': toPercentOffset(ranking.averageHypePercent),
+                  }}
+                >
+                  <div className="svr-rank-meter-value" />
+                  <div className="svr-rank-meter-average" />
                 </div>
               </div>
 
@@ -172,6 +264,12 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
       </section>
     </div>
   )
+
+  if (typeof document === 'undefined') {
+    return modalContent
+  }
+
+  return createPortal(modalContent, document.body)
 }
 
 export default VideoInfoModal

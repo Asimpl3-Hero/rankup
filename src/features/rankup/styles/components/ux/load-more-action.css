@@ -1,4 +1,6 @@
 .ux-load-more-action {
   display: flex;
   justify-content: center;
+  animation: svr-section-in 500ms ease-out both;
+  animation-delay: 210ms;
 }

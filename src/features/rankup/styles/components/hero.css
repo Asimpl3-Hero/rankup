@@ -1,15 +1,30 @@
-.svr-hero {
+﻿.svr-hero {
   position: relative;
   min-height: 420px;
   overflow: hidden;
   border: 4px solid var(--svr-primary);
   background: var(--svr-surface);
   box-shadow: 0 0 15px rgb(239 255 0 / 40%);
+  transition: transform 200ms steps(3, end), box-shadow 200ms steps(2, end);
+}
+
+.svr-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.2;
+  background:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgb(0 255 65 / 6%) 0 1px, transparent 1px 4px);
+  animation: svr-crt-hum 240ms steps(2, end) infinite;
 }
 
 .svr-hero-image {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   opacity: 0.9;
   background:
     radial-gradient(circle at 20% 25%, rgb(0 255 65 / 22%), transparent 38%),
@@ -20,16 +35,28 @@
       transparent 8px 16px
     ),
     linear-gradient(160deg, #0c0c0c 10%, #141414 55%, #090909 100%);
+  transition: opacity 240ms steps(4, end), transform 420ms steps(6, end);
+}
+
+.svr-hero-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(28%) contrast(1.05) saturate(0.75);
 }
 
 .svr-hero:hover .svr-hero-image {
   opacity: 1;
+  transform: scale(1.04);
 }
 
 .svr-hero-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgb(0 0 0 / 45%), transparent 30%, rgb(0 0 0 / 90%) 100%);
+  transition: opacity 220ms steps(3, end);
 }
 
 .svr-hero-content {
@@ -57,6 +84,8 @@
   font-size: clamp(1rem, 2.6vw, 2.2rem);
   color: var(--svr-primary);
   text-shadow: 2px 2px 0 #000, 0 0 8px rgb(239 255 0 / 60%);
+  animation: svr-title-jitter 1.2s ease-in-out infinite;
+  transition: text-shadow 220ms steps(2, end);
 }
 
 .svr-hero-footer p {
@@ -77,14 +106,27 @@
   margin-top: 1.2rem;
 }
 
-.svr-hero-actions button {
+.svr-hero-actions .ui-button {
   color: #000;
-  border: 0;
-  padding: 0.7rem 1rem;
-  font: inherit;
-  cursor: pointer;
   background: var(--svr-primary);
   box-shadow: 4px 4px 0 #a5b500;
+}
+
+.svr-hero:hover {
+  transform: translate(-1px, -2px);
+  box-shadow: 0 0 22px rgb(239 255 0 / 48%);
+}
+
+.svr-hero:hover h2 {
+  text-shadow: 2px 2px 0 #000, 0 0 14px rgb(239 255 0 / 75%);
+}
+
+.svr-hero-actions .ui-button:hover:not(:disabled) {
+  box-shadow: 6px 6px 0 #a5b500;
+}
+
+.svr-hero-actions .ui-button:active:not(:disabled) {
+  box-shadow: 2px 2px 0 #a5b500;
 }
 
 .svr-score-box {
@@ -94,6 +136,7 @@
   padding: 0.75rem 1rem;
   border: 2px solid var(--svr-border);
   background: rgb(0 0 0 / 80%);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .svr-score-box span {
@@ -103,3 +146,10 @@
 .svr-score-box strong {
   color: var(--svr-primary);
 }
+
+.svr-hero:hover .svr-score-box {
+  border-color: var(--svr-secondary);
+  box-shadow: 0 0 10px rgb(0 255 65 / 28%);
+}
+
+

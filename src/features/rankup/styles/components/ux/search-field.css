@@ -1,3 +1,23 @@
 .ux-search-field {
+  color: #fff;
+  border: 2px solid var(--svr-border);
+  background: linear-gradient(180deg, rgb(0 0 0 / 84%), rgb(0 0 0 / 62%));
+  padding: 0.7rem;
   font: inherit;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.ux-search-field::placeholder {
+  color: #9a9a9a;
+}
+
+.ux-search-field:focus {
+  outline: none;
+  border-color: var(--svr-secondary);
+  box-shadow: 0 0 12px rgb(0 255 65 / 32%);
+  transform: translateY(-1px);
 }

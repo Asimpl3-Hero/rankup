@@ -1,8 +1,16 @@
-:root {
+﻿:root {
+  /* Global  */
   --svr-bg: #050505;
   --svr-surface: #111111;
   --svr-border: #333333;
   --svr-primary: #efff00;
   --svr-secondary: #00ff41;
   --svr-muted: #7d7d7d;
+  --svr-header-navbar-bg: #050505;
+
+  /* Shadow */
+  --svr-shadow-secondary: #00ff41;
+  --svr-shadow-tertiary: #3dff79;
+  --svr-shadow-quaternary: #9eff52;
+  --svr-shadow-quinary: #efff00;
 }

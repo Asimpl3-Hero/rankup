@@ -1,13 +1,17 @@
+import { useState } from 'react'
 import { SectionHeader } from './ui'
 import { EmptyState, LoadMoreAction } from './ux'
-import { resolveI18nValue } from '../i18n'
+import { resolveI18nValue, resolvePublishedAtValue } from '../i18n'
 import {
   CARD_TONE_BY_PERCENTILE,
   CARD_VARIANT_BY_PERCENTILE,
   DEFAULT_CARD_TONE_CLASS,
   DEFAULT_CARD_VARIANT_CLASS,
+  GRID_FALLBACK_VIDEO_SOURCES,
   HYPE_PERCENT_SCALE,
 } from '../constants'
+
+const VIDEO_EXTENSION_PATTERN = /\.(mp4|webm|ogg|mov)(\?.*)?$/i
 
 function toSafeHype(value) {
   if (typeof value !== 'number' || Number.isNaN(value) || value < 0) {
@@ -15,6 +19,45 @@ function toSafeHype(value) {
   }
 
   return value
+}
+
+function toMediaSource(value) {
+  if (typeof value !== 'string') {
+    return ''
+  }
+
+  return value.trim()
+}
+
+function resolveCardPrimaryMedia(item) {
+  const directVideoSource = toMediaSource(item?.videoUrl ?? item?.video ?? item?.mediaUrl)
+  if (directVideoSource) {
+    return {
+      source: directVideoSource,
+      type: 'video',
+    }
+  }
+
+  const thumbnailSource = toMediaSource(item?.thumbnail)
+  if (!thumbnailSource) {
+    return null
+  }
+
+  return {
+    source: thumbnailSource,
+    type: VIDEO_EXTENSION_PATTERN.test(thumbnailSource) ? 'video' : 'image',
+  }
+}
+
+function hashString(value) {
+  let hash = 0
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(index)
+    hash |= 0
+  }
+
+  return Math.abs(hash)
 }
 
 function buildRankMap(cartridges) {
@@ -61,6 +104,82 @@ function RankupCartridgeSection({
   onSelectVideo,
 }) {
   const rankMap = buildRankMap(cartridges)
+  const [failedPrimarySourceByKey, setFailedPrimarySourceByKey] = useState({})
+  const [failedFallbackSourceByKey, setFailedFallbackSourceByKey] = useState({})
+  const [loadedMediaSourceByKey, setLoadedMediaSourceByKey] = useState({})
+
+  function getFallbackVideoForKey(cardKey) {
+    if (GRID_FALLBACK_VIDEO_SOURCES.length === 0) {
+      return ''
+    }
+
+    const randomLikeIndex = hashString(cardKey) % GRID_FALLBACK_VIDEO_SOURCES.length
+    return GRID_FALLBACK_VIDEO_SOURCES[randomLikeIndex] ?? GRID_FALLBACK_VIDEO_SOURCES[0] ?? ''
+  }
+
+  function registerMediaError(cardKey, media) {
+    if (!media?.source) {
+      return
+    }
+
+    if (media.isFallback) {
+      setFailedFallbackSourceByKey((previousMap) => {
+        if (previousMap[cardKey] === media.source) {
+          return previousMap
+        }
+
+        return {
+          ...previousMap,
+          [cardKey]: media.source,
+        }
+      })
+      return
+    }
+
+    setFailedPrimarySourceByKey((previousMap) => {
+      if (previousMap[cardKey] === media.source) {
+        return previousMap
+      }
+
+      return {
+        ...previousMap,
+        [cardKey]: media.source,
+      }
+    })
+  }
+
+  function registerMediaLoaded(cardKey, media) {
+    if (!media?.source) {
+      return
+    }
+
+    setLoadedMediaSourceByKey((previousMap) => {
+      if (previousMap[cardKey] === media.source) {
+        return previousMap
+      }
+
+      return {
+        ...previousMap,
+        [cardKey]: media.source,
+      }
+    })
+  }
+
+  function registerVideoReadyFromNode(cardKey, media, node) {
+    if (!node || node.readyState < 2) {
+      return
+    }
+
+    registerMediaLoaded(cardKey, media)
+  }
+
+  function registerImageReadyFromNode(cardKey, media, node) {
+    if (!node || !node.complete) {
+      return
+    }
+
+    registerMediaLoaded(cardKey, media)
+  }
 
   return (
     <section className="svr-cartridge-section">
@@ -77,38 +196,89 @@ function RankupCartridgeSection({
         />
       ) : cartridges.length > 0 ? (
         <div className="svr-cartridge-grid">
-          {cartridges.map((item, index) => (
-            <article
-              key={item.id ?? `${item.title}-${index}`}
-              className={`svr-card ${getCardVariantClass(index, cartridges.length, rankMap)}`}
-              role="button"
-              tabIndex={0}
-              onClick={() => onSelectVideo?.(item)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  onSelectVideo?.(item)
-                }
-              }}
-            >
-              <div className="svr-card-image" />
-              <div className="svr-card-overlay" />
-              <div className="svr-card-meta">
-                <h4>{resolveI18nValue(item.title, i18n.fallback.untitledVideo)}</h4>
-                {(item.author || item.publishedAt || item.hype !== undefined) && (
-                  <div className="svr-card-stats">
-                    <span>{resolveI18nValue(item.author, i18n.fallback.unknown)}</span>
-                    <span>{item.hype !== undefined ? `${Math.round(item.hype * HYPE_PERCENT_SCALE)}%` : '--'}</span>
-                  </div>
-                )}
-                {item.publishedAt ? (
-                  <div className="svr-card-date">
-                    {resolveI18nValue(item.publishedAt, i18n.fallback.noDate)}
-                  </div>
-                ) : null}
-              </div>
-            </article>
-          ))}
+          {cartridges.map((item, index) => {
+            const cardKey = item.id ?? `${item.title}-${index}`
+            const title = resolveI18nValue(item.title, i18n.fallback.untitledVideo)
+            const primaryMedia = resolveCardPrimaryMedia(item)
+            const fallbackVideoSource = getFallbackVideoForKey(cardKey)
+            const hasPrimarySourceFailed = failedPrimarySourceByKey[cardKey] === primaryMedia?.source
+            const hasFallbackSourceFailed = failedFallbackSourceByKey[cardKey] === fallbackVideoSource
+            const displayedMedia = primaryMedia?.source && !hasPrimarySourceFailed
+              ? { ...primaryMedia, isFallback: false }
+              : fallbackVideoSource && !hasFallbackSourceFailed
+                ? { source: fallbackVideoSource, type: 'video', isFallback: true }
+                : null
+            const isMediaLoaded = displayedMedia?.source
+              ? loadedMediaSourceByKey[cardKey] === displayedMedia.source
+              : true
+
+            return (
+              <article
+                key={cardKey}
+                className={`svr-card ${getCardVariantClass(index, cartridges.length, rankMap)}`}
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelectVideo?.(item)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    onSelectVideo?.(item)
+                  }
+                }}
+              >
+                <div className="svr-card-image">
+                  {!isMediaLoaded ? (
+                    <div
+                      className="svr-card-skeleton"
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  {displayedMedia?.type === 'video' ? (
+                    <video
+                      className={`svr-card-media ${isMediaLoaded ? 'is-loaded' : ''}`}
+                      src={displayedMedia.source}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                      aria-hidden="true"
+                      ref={(node) => registerVideoReadyFromNode(cardKey, displayedMedia, node)}
+                      onLoadedMetadata={() => registerMediaLoaded(cardKey, displayedMedia)}
+                      onCanPlay={() => registerMediaLoaded(cardKey, displayedMedia)}
+                      onLoadedData={() => registerMediaLoaded(cardKey, displayedMedia)}
+                      onError={() => registerMediaError(cardKey, displayedMedia)}
+                    />
+                  ) : displayedMedia?.type === 'image' ? (
+                    <img
+                      className={`svr-card-media ${isMediaLoaded ? 'is-loaded' : ''}`}
+                      src={displayedMedia.source}
+                      alt={title}
+                      loading="lazy"
+                      ref={(node) => registerImageReadyFromNode(cardKey, displayedMedia, node)}
+                      onLoad={() => registerMediaLoaded(cardKey, displayedMedia)}
+                      onError={() => registerMediaError(cardKey, displayedMedia)}
+                    />
+                  ) : null}
+                </div>
+                <div className="svr-card-overlay" />
+                <div className="svr-card-meta">
+                  <h4>{title}</h4>
+                  {(item.author || item.publishedAt || item.hype !== undefined) && (
+                    <div className="svr-card-stats">
+                      <span>{resolveI18nValue(item.author, i18n.fallback.unknown)}</span>
+                      <span>{item.hype !== undefined ? `${Math.round(item.hype * HYPE_PERCENT_SCALE)}%` : '--'}</span>
+                    </div>
+                  )}
+                  {item.publishedAt ? (
+                    <div className="svr-card-date">
+                      {resolvePublishedAtValue(item.publishedAt, i18n, i18n.fallback.noDate)}
+                    </div>
+                  ) : null}
+                </div>
+              </article>
+            )
+          })}
         </div>
       ) : (
         <EmptyState

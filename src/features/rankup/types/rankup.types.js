@@ -11,6 +11,9 @@
  * @typedef {Object} RankupApiVideoItem
  * @property {string} [id]
  * @property {string} [thumbnail]
+ * @property {string} [videoUrl]
+ * @property {string} [video]
+ * @property {string} [mediaUrl]
  * @property {string} [title]
  * @property {string} [author]
  * @property {string} [publishedAt]
@@ -22,6 +25,9 @@
  * @property {string=} id
  * @property {string} title
  * @property {string=} thumbnail
+ * @property {string=} videoUrl
+ * @property {string=} video
+ * @property {string=} mediaUrl
  * @property {string=} author
  * @property {string=} publishedAt
  * @property {number=} hype
@@ -43,7 +49,10 @@
  * @typedef {Object} RankupI18n
  * @property {{ offlinePrefix: string, unknownError: string }} api
  * @property {{ vectorsSuffix: string }} counters
+ * @property {{ noDate: string }} fallback
  * @property {RankupMetricPanelsCopy} metricPanels
+ * @property {{ recordingLabel: string }} modal
+ * @property {Record<string, string>} relativeTime
  */
 
 /**

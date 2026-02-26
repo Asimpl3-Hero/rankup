@@ -1,34 +1,88 @@
-.svr-footer {
+﻿.svr-footer {
+  position: relative;
+  overflow: hidden;
   text-align: center;
   padding: 2rem 1rem;
   border-top: 4px solid var(--svr-border);
   background: #000;
+  animation: svr-section-in 520ms steps(10, end) both;
+  animation-delay: 250ms;
+}
+
+.svr-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background:
+    radial-gradient(circle at 14% 18%, rgb(0 255 65 / 16%), transparent 34%),
+    radial-gradient(circle at 84% 82%, rgb(239 255 0 / 14%), transparent 40%);
 }
 
 .svr-footer-title {
+  position: relative;
   color: var(--svr-primary);
   font-size: 1.1rem;
+  text-shadow: 2px 2px 0 #000, 0 0 8px rgb(239 255 0 / 45%);
+  animation: svr-title-jitter 1.2s ease-in-out infinite;
 }
 
 .svr-footer-links {
+  position: relative;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1rem;
 }
 
 .svr-footer-links a {
+  position: relative;
   color: var(--svr-muted);
   text-decoration: none;
+  transition:
+    color 160ms steps(2, end),
+    text-shadow 160ms steps(2, end),
+    transform 160ms steps(2, end);
+}
+
+.svr-footer-links a::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -0.22rem;
+  left: 0;
+  height: 2px;
+  opacity: 0;
+  background: currentColor;
+  transform: scaleX(0.7);
+  transition: transform 160ms steps(2, end), opacity 160ms steps(2, end);
 }
 
 .svr-footer-links a:hover {
   color: var(--svr-secondary);
+  transform: translateY(-1px);
+  text-shadow: 0 0 8px rgb(0 255 65 / 35%);
+}
+
+.svr-footer-links a:hover::after,
+.svr-footer-links a:focus-visible::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .svr-footer small {
+  position: relative;
   display: block;
   margin-top: 1rem;
   color: #5a5a5a;
   font-size: 0.62rem;
+  transition: color 180ms ease;
 }
+
+.svr-footer:hover small {
+  color: #7e7e7e;
+}
+
+
