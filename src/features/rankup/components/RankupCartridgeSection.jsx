@@ -60,6 +60,12 @@ function hashString(value) {
   return Math.abs(hash)
 }
 
+function shouldAutoPlayVideo(cardKey, mediaSource) {
+  const signature = `${cardKey}|${mediaSource}`
+  const threshold = 65
+  return hashString(signature) % 100 < threshold
+}
+
 function buildRankMap(cartridges) {
   const rankedIndexes = [...cartridges.keys()].sort(
     (leftIndex, rightIndex) =>
@@ -211,6 +217,9 @@ function RankupCartridgeSection({
             const isMediaLoaded = displayedMedia?.source
               ? loadedMediaSourceByKey[cardKey] === displayedMedia.source
               : true
+            const isAutoPlayEnabled = displayedMedia?.type === 'video'
+              ? shouldAutoPlayVideo(cardKey, displayedMedia.source)
+              : false
 
             return (
               <article
@@ -237,8 +246,8 @@ function RankupCartridgeSection({
                     <video
                       className={`svr-card-media ${isMediaLoaded ? 'is-loaded' : ''}`}
                       src={displayedMedia.source}
-                      autoPlay
-                      loop
+                      autoPlay={isAutoPlayEnabled}
+                      loop={isAutoPlayEnabled}
                       muted
                       playsInline
                       preload="metadata"

@@ -1,0 +1,11 @@
+services:
+  rankup-web:
+    container_name: rankup-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${RANKUP_PORT:-8080}:80"
+    restart: unless-stopped

@@ -25,6 +25,14 @@ function toPercentOffset(percent) {
   return `${Math.max(0, Math.min(100, percent))}%`
 }
 
+function toEngagementValue(value) {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+    return '--'
+  }
+
+  return new Intl.NumberFormat().format(Math.round(value))
+}
+
 function getFocusableElements(container) {
   if (!container) {
     return []
@@ -133,6 +141,8 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
   const title = resolveI18nValue(video.title, i18n.fallback.untitledVideo)
   const author = resolveI18nValue(video.author, i18n.fallback.unknownChannel)
   const publishedAt = resolvePublishedAtValue(video.publishedAt, i18n, i18n.fallback.noDate)
+  const likesCount = toEngagementValue(video.likes)
+  const commentsCount = toEngagementValue(video.comments)
   const recMinutes = String(
     (ranking.position * MODAL_REC_TIME.minutesWeight + ranking.hypePercent) % MODAL_REC_TIME.minutesMod,
   ).padStart(MODAL_TIME_PAD_LENGTH, '0')
@@ -193,6 +203,17 @@ function VideoInfoModal({ i18n, isOpen, onClose, rankingPool, video }) {
               <div className="svr-modal-preview-meta">
                 <span>{i18n.modal.sourceLabel}: {sourceId}</span>
                 <span>{i18n.modal.liveConnectionLabel}</span>
+              </div>
+
+              <div className="svr-modal-preview-engagement">
+                <article className="svr-modal-preview-engagement-cell">
+                  <span>{i18n.modal.likesLabel}</span>
+                  <strong>{likesCount}</strong>
+                </article>
+                <article className="svr-modal-preview-engagement-cell">
+                  <span>{i18n.modal.commentsLabel}</span>
+                  <strong>{commentsCount}</strong>
+                </article>
               </div>
             </aside>
 

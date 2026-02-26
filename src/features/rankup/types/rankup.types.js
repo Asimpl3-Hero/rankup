@@ -31,6 +31,8 @@
  * @property {string=} author
  * @property {string=} publishedAt
  * @property {number=} hype
+ * @property {number=} likes
+ * @property {number=} comments
 */
 
 /**
