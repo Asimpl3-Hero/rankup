@@ -57,6 +57,8 @@ RANKUP_PORT=8080
 
 ## 💉 Integracion con backend
 
+- backend (NestJS): https://github.com/Asimpl3-Hero/rankup-api
+
 Endpoint consumido por frontend:
 
 - `GET /api/videos`
