@@ -1,3 +1,4 @@
+# 🎮 Rankup
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
 ![Jest](https://img.shields.io/badge/Jest-30-C21325?logo=jest&logoColor=white)
@@ -5,8 +6,6 @@
 ![ESLint](https://img.shields.io/badge/ESLint-9-4B32C3?logo=eslint&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-1.27-009639?logo=nginx&logoColor=white)
-
-# 🎮 Rankup
 
 Frontend de Rankup para visualizar el feed de videos con UI arcade retro 80s.
 Librerias clave: `react`, `react-dom`, `react-howler`, `@testing-library/react`, `jest`.
