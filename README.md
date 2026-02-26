@@ -106,3 +106,23 @@ docker compose down
 
 - El proyecto esta orientado a una SPA.
 - El estilo visual prioriza coherencia arcade retro en toda la experiencia.
+
+## :bar_chart: Coverage (pruebas unitarias)
+
+Comando:
+
+```bash
+npm run test:coverage
+```
+
+Resultado actual (ultimo run local):
+
+- Statements: `98.78%`
+- Branches: `84.61%`
+- Functions: `100%`
+- Lines: `98.78%`
+
+Notas:
+
+- Suite actual: `11` test suites, `53` tests.
+- Cobertura objetivo cumplida (`>= 80%`).
